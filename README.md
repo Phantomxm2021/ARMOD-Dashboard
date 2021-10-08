@@ -14,3 +14,6 @@ The dashboard is the AR content manager system. It helps our AR Experience and s
 - Restful API Support
 
 More information plz check: https://docs.phantomsxr.com/
+
+# How to install?
+Plz read the docs: https://docs.phantomsxr.com/v/english-0.0.5/getting-started/privatization-deployment-dashboard
