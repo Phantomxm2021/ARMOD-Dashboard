@@ -1,0 +1,56 @@
+<!-- 应用信息的Modal -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="modal fade" id="modal-app-info" tabindex="-1" role="dialog" aria-labelledby="modal-app-info"
+            aria-hidden="true">
+            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="modal-app-info-title">Application Detail</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="text-left">
+
+                            <div class="form-group">
+                                <label for="packagename-text-input" class="form-control-label">Package Name</label>
+                                <input class="form-control" type="text" value="{{appinfo.packageid}}"
+                                    id="packagename-text-input" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="token" class="form-control-label">Token</label>
+                                <button id='copytoken' class="btn btn-sm" data-clipboard-action="copy"
+                                    data-clipboard-target="#token">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <textarea class="form-control" id="token" rows="6" readonly>{{appinfo.token}}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="descriptFormControlTextarea1" class="form-control-label">Description</label>
+                                <textarea class="form-control" id="descriptFormControlTextarea1" rows="2"
+                                    disabled>{{appinfo.description}}</textarea>
+                            </div>
+                           
+                            <div class="form-group">
+                                <label for="createtime-text-input" class="form-control-label">Create Time</label>
+                                <input class="form-control" type="text" value="{{appinfo.create_time}}"
+                                    id="createtime-text-input" disabled>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,386 @@
+{% extends "dashboardbase.html" %}
+{% load static %}
+{% block title %}
+ARExperiences
+{% endblock %}
+
+{% block body %}
+{% csrf_token %}
+
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">ARExperiences</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}">Applications</a></li>
+              <li class="breadcrumb-item active" aria-current="page">ARExperiences</li>
+            </ol>
+          </nav>
+        </div>
+        {% include 'dashboard/arexperience_list_menu.html'%}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div>
+    <div class="card">
+      <!-- Card header -->
+      <div class="card-header border-0">
+        <h3 class="mb-0">ARExperience List</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col" class="sort" data-sort="name">ID</th>
+              <th scope="col" class="sort" data-sort="budget">Name</th>
+              <th scope="col" class="sort" data-sort="status">Permissions</th>
+              <th scope="col" class="sort" data-sort="status">Create Time</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody class="list">
+            {% for project in arshowcase_list %}
+            <tr>
+              <th scope="row">
+                <span class="name mb-0 text-sm">{{project.arexperience_uid}}</span>
+              </th>
+              <td>
+                <span class="text">{{project.name}}</span>
+              </td>
+              <td>
+                <span class="text">{% if project.status == 1 %}Public {% else %} Private{% endif %}</span>
+              </td>
+              <td>
+                <span class="text">{{project.create_time}}</span>
+              </td>
+              <td class="table-actions text-right">
+                <a type="button" class="btn btn-primary btn-sm text-white" data-toggle="modal"
+                  data-target="#modal-project-info"
+                  onclick="getprojectdetail({{project.app_uid}},{{project.arexperience_uid}},'{{project.name}}')">Edit</a>
+                <a type="button" class="btn btn-warning btn-sm text-white" data-toggle="modal"
+                  data-target="#del-project-modal"
+                  onclick="onselected({{project.app_uid}},{{project.arexperience_uid}},'{{project.name}}')">Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Card footer -->
+      <div class="card-footer py-4">
+        {% if arshowcase_list.has_other_pages %}
+        <nav aria-label="...">
+          <ul class="pagination justify-content-end mb-0">
+            {% if arshowcase_list.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ arshowcase_list.previous_page_number }}" tabindex="-1">
+                <i class="fas fa-angle-left"></i>
+                <span class="sr-only">Previous</span>
+              </a>
+            </li>
+            {% endif %}
+            {% for page_num in arshowcase_list.paginator.page_range %}
+            {% if page_num == arshowcase_list.number %}
+            <li class="page-item active ">
+              {% else %}
+            <li class="page-item">
+              {% endif %}
+              <a class="page-link" href="?page={{page_num}}">{{page_num}}</a>
+            </li>
+            {% endfor %}
+            {% if arshowcase_list.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ arshowcase_list.next_page_number }}">
+                <i class="fas fa-angle-right"></i>
+                <span class="sr-only">Next</span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+{% include 'dashboard/arexperience_create_modal.html' %}
+{% include 'dashboard/arexperience_delete_modal.html' %}
+{% include 'dashboard/arexperience_app_info_modal.html' %}
+{% include 'dashboard/arexperience_detail_modal.html' %}
+
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  var no_data = 'No Data'
+  var clipboard = new ClipboardJS('.btn');
+  clipboard.on('success', function (e) {
+    e.clearSelection();
+    setTooltip('Copied!')
+    hideTooltip();
+  });
+
+  clipboard.on('error', function (e) {
+    setTooltip('Failed!');
+    hideTooltip();
+  });
+
+  Date.prototype.Format = function (fmt) { // author: meizz
+    var o = {
+      "M+": this.getMonth() + 1, // 月份
+      "d+": this.getDate(), // 日
+      "h+": this.getHours(), // 小时
+      "m+": this.getMinutes(), // 分
+      "s+": this.getSeconds(), // 秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+      "S": this.getMilliseconds() // 毫秒
+    };
+    if (/(y+)/.test(fmt))
+      fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
+
+  $("#copytoken").tooltip({
+    trigger: 'click',
+    placement: 'top'
+  })
+
+  function setTooltip(message) {
+    $('#copytoken').tooltip('hide')
+      .attr('data-original-title', message)
+      .tooltip('show');
+  }
+  function hideTooltip() {
+    setTimeout(function () {
+      $('#copytoken').tooltip('hide');
+    }, 500);
+  }
+
+
+  var app_uid = -1;
+  var projectname = '';
+  var arexperience_uid = -1
+  function onselected(app_uid, arexperience_uid, projectname) {
+    this.app_uid = app_uid;
+    this.arexperience_uid = arexperience_uid;
+    this.projectname = projectname;
+  }
+
+  function deleteproject() {
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = { 'arexperience_uid': arexperience_uid, 'app_uid': app_uid };
+
+    $.ajax({
+      url: "{% url 'applications:projectdelete' %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            window.location.reload()
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  }
+
+  function createproject() {
+    projectname = $("#projectname").val()
+    // competence = $("#competence").get(0).selectedIndex;
+    projectdescription = $("#projectdescription").val()
+    if (projectname == '') return;
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = {
+      'app_uid': '{{appinfo.app_uid}}',
+      'projectname': projectname,
+      // 'competence': competence,
+      'projectdescription': projectdescription,
+    }
+    $.ajax({
+      url: "{% url 'applications:appdetails' appinfo.app_uid %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            window.location.reload()
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+
+  }
+
+  function getprojectdetail(app_uid, arexperience_uid, projectname) {
+    onselected(app_uid, arexperience_uid, projectname)
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'applications:appdetails' appinfo.app_uid %}projectdetails/" + arexperience_uid,
+      type: 'GET',
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            $("#project-name-inputer").val(result.data.name)
+            var create_time = new Date(result.data.create_time).Format("yyyy-MM-dd hh:mm:ss");
+            var update_time = new Date(result.data.update_time).Format("yyyy-MM-dd hh:mm:ss");;
+            $("#project-create-time").html(create_time)
+            $("#project-update-time").html(update_time)
+
+            ios_json = result.data.assets.ios_json
+            ios_bundle = result.data.assets.ios_bundle
+            android_json = result.data.assets.android_json
+            android_bundle = result.data.assets.android_bundle
+
+            $("#ios-json").html(ios_json == '' ? no_data : ios_json);
+            $("#ios-bundle").html(ios_bundle == '' ? no_data : ios_bundle);
+            $("#android-json").html(android_json == '' ? no_data : android_json);
+            $("#android-bundle").html(android_bundle == '' ? no_data : android_bundle);
+
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  }
+
+  function iosAssetsSelected() {
+    var ios_files = $('#iOS')[0].files
+    uploadAssets('iOS', ios_files)
+  }
+
+  function androidAssetsSelected() {
+    var android_files = $('#Android')[0].files
+    uploadAssets('Android', android_files)
+  }
+
+
+
+  function uploadAssets(platform, files) {
+    $("#asseturl-"+platform).attr("Style", "display:none;");
+    $("#spinner-"+platform).attr("Style", "display:block;");
+    var data = new FormData();
+    data.append('platform', platform)
+    data.append("projectname", projectname);
+
+    data.append(files[0].name.split('.').pop().toLowerCase(), files[0])
+    data.append(files[1].name.split('.').pop().toLowerCase(), files[1])
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      xhr: function () {
+        var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function (evt) {
+          if (evt.lengthComputable) {
+            var percentComplete = (evt.loaded / evt.total) * 100;
+            console.log(percentComplete)
+            // Place upload progress bar visibility code here
+          }
+        }, false);
+        return xhr;
+      },
+      url: "{% url 'applications:appdetails' appinfo.app_uid %}projectdetails/" + arexperience_uid,
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            data = result.data;
+            $("#ios-json").html(data.ios_json == '' ? no_data : data.ios_json);
+            $("#ios-bundle").html(data.ios_bundle == '' ? no_data : data.ios_bundle);
+            $("#android-json").html(data.android_json == '' ? no_data : data.android_json);
+            $("#android-bundle").html(data.android_bundle == '' ? no_data : data.android_bundle);
+            var create_time = new Date(data.create_time).Format("yyyy-MM-dd hh:mm:ss");
+            var update_time = new Date(data.update_time).Format("yyyy-MM-dd hh:mm:ss");;
+            $("#project-create-time").html(create_time)
+            $("#project-update-time").html(update_time)
+            new Notify('top', 'right', 'ni ni-bell-55', 'success', 'Success!!!', result.message)
+
+            $("#asseturl-"+platform).attr("Style", "display:block;");
+            $("#spinner-"+platform).attr("Style", "display:none;");
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'Error!!!', result.message)
+
+            break;
+        }
+
+        $('#iOS').val(null)
+        $('#Android').val(null)
+      },
+      error: function (_data) { console.log(_data); },
+      contentType: false,
+      processData: false,
+    })
+  }
+
+  $("#update_arexperience").click(function () {
+
+
+
+    data = { 'projectname': $("#project-name-inputer").val() }
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'applications:appdetails' appinfo.app_uid %}projectdetails/" + arexperience_uid + "/update",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            $("#project-name-inputer").val(result.data.name)
+            var create_time = new Date(result.data.create_time).Format("yyyy-MM-dd hh:mm:ss");
+            var update_time = new Date(result.data.update_time).Format("yyyy-MM-dd hh:mm:ss");;
+            $("#project-create-time").html(create_time)
+            $("#project-update-time").html(update_time)
+            new Notify('top', 'right', 'ni ni-bell-55', 'success', 'Success!!!', result.message)
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  })
+</script>
+
+
+{% endblock %}

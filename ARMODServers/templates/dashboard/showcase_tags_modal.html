@@ -1,0 +1,32 @@
+<!-- 新建Tag的Modal -->
+<div class="modal fade" id="create-new-tags-modal" tabindex="-1" role="dialog"
+  aria-labelledby="create-new-tags-modal-label" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newTagsModalLabel">All Tags</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% csrf_token %}
+        <label for="tag-text-input" class="form-control-label">New Tag Name</label>
+
+        <div class="input-group input-group-sm mb-3">
+          <input class="form-control" type="text" placeholder="New Tag Name" id="showcase_new_tag" name='showcase_name'>
+          <input class="form-control" type="text" placeholder="Sort Weight" id="showcase_tag_weight"
+            name='showcase_name'>
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="button" id="addnewtag">Add New Tag</button>
+          </div>
+        </div>
+
+        {% include 'dashboard/showcase_tags_modal_table.html'%}
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 新建项目的Modal -->

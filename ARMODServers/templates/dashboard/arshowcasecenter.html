@@ -1,0 +1,452 @@
+{% extends "dashboardbase.html" %}
+{% load static %}
+{% block title %}
+Showcases
+{% endblock %}
+
+{% block head%}
+<link rel="stylesheet" href="{% static '/css/cover.css' %}">
+{% endblock %}
+
+{% block body %}
+{% csrf_token %}
+
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Showcase</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}">Applications</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Showcase</li>
+            </ol>
+          </nav>
+        </div>
+        {% include 'dashboard/showcase_menu.html' %}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div>
+    <div class="card">
+      <!-- Card header -->
+      <div class="card-header border-0">
+        <h3 class="mb-0">Showcase List</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col" class="sort" data-sort="name">Showcase UID</th>
+              <th scope="col" class="sort" data-sort="budget">Showcase Name</th>
+              <th scope="col" class="sort" data-sort="status">Showcase Permissions</th>
+              <th scope="col" class="sort" data-sort="status">Showcase Status</th>
+              <th scope="col" class="sort" data-sort="status">Showcase Create Time</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody class="list">
+            {% for case in arshowcase_list %}
+            <tr>
+              <th scope="row">
+                <span class="name mb-0 text-sm">{{case.showcase_uid}}</span>
+              </th>
+              <td>
+                <span class="text">{{case.showcase_name}}</span>
+              </td>
+              <td>
+                <span class="text">{% if case.showcase_permission == 1 %}Public {% else %} Private{% endif %}</span>
+              </td>
+              <td>
+                <span class="text">{% if case.showcase_status == 1 %}Online {% else %} Offline{% endif %}</span>
+              </td>
+              <td>
+                <span class="text">{{case.create_time}}</span>
+              </td>
+              <td class="table-actions text-right">
+                <a type="button" class="btn btn-primary btn-sm text-white" data-toggle="modal"
+                  data-target="#modal-project-info"
+                  onclick="get_project_detail({{case.app_uid}},{{case.showcase_uid}},'{{case.showcase_name}}')">Edit</a>
+                <a type="button" class="btn btn-warning btn-sm text-white" data-toggle="modal"
+                  data-target="#del-project-modal"
+                  onclick="on_selected({{case.app_uid}},{{case.showcase_uid}},'{{case.showcase_name}}')">Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% include 'dashboard/showcase_card_footer.html' %}
+
+    </div>
+  </div>
+</div>
+
+{% include 'dashboard/showcase_create_modal.html' %}
+{% include 'dashboard/showcase_remove_modal.html' %}
+{% include 'dashboard/showcase_detail_modal.html' %}
+{% include 'dashboard/showcase_tags_modal.html' %}
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/extension.js' %}"></script>
+
+<script>
+  var tags = []
+  var app_uid = -1;
+  var showcase_name = '';
+  var showcase_uid = -1
+  var images = new Array();
+  var tagsOption = new Array()
+  tags['tags_has_changed'] = false
+  $('#create-new-project-modal').on('shown.bs.modal', function () {
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasetag' %}",
+      type: 'GET',
+      data: { 'app_uid': "{{app_uid}}" },
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            for (var tag in result.data) {
+              newOption = new Option(result.data[tag].tag_name, result.data[tag].tag_name, false, false)
+              $("#showcase_tags").append(newOption)
+
+            }
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  })
+
+  $('#create-new-project-modal').on('hidden.bs.modal', function () {
+    $('#showcase_tags').val(null)
+    $('#showcase_tags').find('option').remove()
+  })
+
+  $('#showcase_tags').on('select2:select', function (e) {
+    var data = e.params.data;
+    tags['tags_has_changed'] = true
+  });
+
+  $('#showcase_tags_detail').on('select2:select', function (e) {
+    var data = e.params.data;
+    tags['tags_has_changed'] = true
+  });
+
+  $('#showcase_tags_detail').on('select2:unselect', function (e) {
+    var data = e.params.data;
+    tags['tags_has_changed'] = true
+  });
+
+  $('#modal-project-info').on('hidden.bs.modal', function () {
+    $('#showcase_tags_detail').val(null)
+    $('#showcase_tags_detail').find('option').remove()
+  });
+
+  $("#create-new-tags-modal").on('hidden.bs.modal', function () {
+    setTimeout(function () {
+      location.reload();
+    }, 100);
+  })
+
+  function on_selected(app_uid, showcase_uid, showcase_name) {
+    this.app_uid = app_uid;
+    this.showcase_uid = showcase_uid;
+    this.showcase_name = showcase_name;
+  }
+
+  function delete_project() {
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = {
+      'showcase_uid': showcase_uid,
+      'app_uid': app_uid,
+      'action': 'delete_showcase'
+    };
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasesprojectpost' %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            window.location.reload()
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  }
+
+  function create_project() {
+    showcase_name = $("#showcase_name").val()
+    showcase_permission = $("#showcase_permission").get(0).selectedIndex;
+    showcase_description = $("#showcase_description").val()
+    arexperience_uid = $("#arexperience_uid").val()
+    tags['showcase_tags'] = $('#showcase_tags').val();
+    showcase_brief = $("#showcase_brief").val()
+    showcase_recommend = $("#showcase_recommend_check").is(":checked") ? 'True' : 'False';
+
+    if (showcase_name == '' || arexperience_uid == '') {
+      new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', 'Incorrect showcase name or arexperience uid')
+      return;
+    }
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = {
+      'action': 'create_showcase',
+      'app_uid': '{{app_uid}}',
+      'arexperience_uid': arexperience_uid,
+      'showcase_name': showcase_name,
+      'showcase_permission': showcase_permission,
+      'showcase_description': showcase_description,
+      'showcase_brief': showcase_brief,
+      'showcase_recommend': showcase_recommend,
+      'showcase_tags': JSON.stringify({ 'has_changed': tags['has_changed'], 'showcase_tags': tags['showcase_tags'] })
+    }
+
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasesprojectpost' %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            window.location.reload()
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+
+  }
+
+  function get_project_detail(app_uid, showcase_uid, showcase_name) {
+    on_selected(app_uid, showcase_uid, showcase_name)
+    showcase_name = $("#showcase_name_detail").val()
+    // showcase_status = $("#showcase_status_detail").get(0).selectedIndex;
+    // showcase_permission = $("#showcase_permission_detail").get(0).selectedIndex;
+    showcase_description = $("#showcase_description_detail").val()
+
+
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = {
+      'action': 'get_showcase',
+      'app_uid': '{{app_uid}}',
+      'showcase_uid': showcase_uid,
+      'showcase_name': showcase_name,
+      // 'showcase_status': showcase_status,
+      'showcase_description': showcase_description,
+      // 'showcase_permission': showcase_permission,
+    }
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasesprojectpost' %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        showcase = result.data.showcase
+        switch (result.code) {
+          case 200:
+
+            $("#showcase_name_detail").val(showcase.showcase_name)
+            $("#showcase_status_detail").val(showcase.showcase_status)
+            $("#showcase_permission_detail").val(showcase.showcase_permission)
+            $("#showcase_description_detail").val(showcase.showcase_description)
+            $("#showcase_icon_img").attr('src', showcase.showcase_icon);
+            $("#showcase_header_img").attr('src', showcase.showcase_header);
+            $("#showcase_recommend_check_detail").prop('checked', showcase.showcase_recommend);
+            
+            {% for option in all_preset_tags %}
+            newOption = new Option("{{option.tag_name}}", "{{option.tag_name}}", false, false);
+            $('#showcase_tags_detail').append(newOption).trigger('change');
+            {% endfor %}
+
+            for (var tag in showcase.showcase_tags) {
+              newOption = new Option(showcase.showcase_tags[tag], showcase.showcase_tags[tag], true, true);
+              $('#showcase_tags_detail').append(newOption).trigger('change');
+            }
+
+            $('#showcase_arexperience_binding_detail').val(showcase.arexperience_uid)
+            $('#showcase_uid_detail').html('Basic(UID:{0})'.Format(showcase.showcase_uid))
+            $('#showcase_brief_detail').val(showcase.showcase_brief)
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  }
+
+  function header_Image_Selected() {
+    var showcaseheaderimage = $('#showcase-header')[0].files
+    draw_preview('showcase_header_img', showcaseheaderimage)
+  }
+
+  function iconImageSelected() {
+    var showcase_icon = $('#showcase-icon')[0].files
+    draw_preview('showcase_icon_img', showcase_icon)
+  }
+
+
+  function draw_preview(node, file) {
+    if (file == null) return;
+    images[node] = file
+    var freader = new FileReader();
+    freader.readAsDataURL(file[0]);
+    freader.onload = function (e) {
+      $("#" + node).attr('src', e.target.result);
+    }
+  }
+
+  function save_change() {
+    showcase_name = $("#showcase_name_detail").val()
+    showcase_status = $("#showcase_status_detail").get(0).selectedIndex;
+    showcase_permission = $("#showcase_permission_detail").get(0).selectedIndex;
+    
+    showcase_brief = $("#showcase_brief_detail").val()
+    showcase_arexperience_uid = $("#showcase_arexperience_binding_detail").val()
+    showcase_description = $("#showcase_description_detail").val()
+    tags['showcase_tags'] = $('#showcase_tags_detail').val();
+    showcase_recommend = $('#showcase_recommend_check_detail').is(":checked") ? 'True' : 'False';
+    if (showcase_name == '') return;
+    var data = new FormData();
+    data.append("app_uid", app_uid);
+    data.append("showcase_uid", showcase_uid);
+    data.append("showcase_arexperience_uid", showcase_arexperience_uid);
+    data.append("showcase_description", showcase_description);
+    data.append("showcase_status", showcase_status);
+    data.append("showcase_brief", showcase_brief);
+    data.append("showcase_name", showcase_name);
+    data.append("showcase_recommend", showcase_recommend);
+    data.append("showcase_permission", showcase_permission);
+    data.append("action", 'save_change');
+    data.append("showcase_tags", JSON.stringify({ 'tags_has_changed': tags['tags_has_changed'], 'showcase_tags': tags['showcase_tags'] }));
+
+    for (var img in images) {
+      data.append(img, images[img][0]);
+    }
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasesprojectpost' %}",
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            new Notify('top', 'right', 'ni ni-bell-55', 'success', 'Success!!!', result.message)
+            tags['tags_has_changed'] = false
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'Error!!!', result.message)
+            break;
+        }
+      },
+      error: function (_data) { console.log(_data); },
+      contentType: false,
+      processData: false,
+    })
+
+  }
+
+  function delete_tag(tagname) {
+    passData = {
+      'action': 'delete_tag',
+      'app_uid': "{{app_uid}}",
+      'tag_name': tagname
+    }
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasetag' %}",
+      type: 'POST',
+      data: passData,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            new Notify('top', 'right', 'ni ni-bell-55', 'success', 'Success!!!', result.message)
+            $("#showcase_tags_table_body").html(result.data.modal)
+
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'Error!!!', result.message)
+            break;
+        }
+      },
+      error: function (_data) { console.log(_data); },
+    })
+  }
+
+  $("#addnewtag").click(function () {
+    new_tag = $("#showcase_new_tag").val()
+    if (new_tag == '' || new_tag == 'undefine') {
+      new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', 'You can not add empty tag!')
+      return;
+    }
+    passData = {
+      'action': 'create_tag',
+      'app_uid': "{{app_uid}}",
+      'tag_name': new_tag,
+      'showcase_tag_weight': $("#showcase_tag_weight").val()
+    }
+
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+      url: "{% url 'arshowcasescenter:arshowcasetag' %}",
+      type: 'POST',
+      data: passData,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            new Notify('top', 'right', 'ni ni-bell-55', 'success', 'Success!!!', result.message)
+            $("#showcase_tags_table_body").html(result.data.modal)
+
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'Error!!!', result.message)
+            break;
+        }
+      },
+      error: function (_data) { console.log(_data); },
+    })
+  })
+</script>
+
+
+{% endblock %}

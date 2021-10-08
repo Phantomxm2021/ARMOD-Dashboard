@@ -1,0 +1,146 @@
+{% extends "authbase.html" %}
+{% block title %}
+Change Password
+{% endblock %}
+
+{% block body %}
+<!-- Main content -->
+<div class="main-content">
+  <!-- Header -->
+  <div class="header bg-gradient-primary py-9 py-lg-8 pt-lg-9">
+    <div class="container">
+      <div class="header-body text-center mb-9">
+        <div class="row justify-content-center">
+          <div class="col-xl-5 col-lg-6 col-md-8 px-5">
+            <h1 class="text-white">Set your new password</h1>
+            <p class="text-lead text-white">Lost the key to open the new world, get it back now!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="separator separator-bottom separator-skew zindex-100">
+      <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1"
+        xmlns="http://www.w3.org/2000/svg">
+        <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
+      </svg>
+    </div>
+  </div>
+  <!-- Page content -->
+  <div class="container mt--8 pb-5">
+    <!-- Table -->
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card bg-secondary border-0">
+          <div class="card-body px-lg-5 py-lg-5">
+            <div class="text-center text-muted mb-4">
+              <small>New Password</small>
+            </div>
+            <form role="form" id='resetpassword_form' action="{% url 'auth:resetpassword' token%}" method='post'
+              class="needs-validation" novalidate onsubmit="return sub_resetpassword();">
+              {% csrf_token %}
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                  </div>
+                  <input class="form-control" id='new_password' placeholder="New Password" name='new_password'
+                    type="password">
+                  <div id='pwdTips' class="invalid-feedback"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                  </div>
+                  <input id="password2" class="form-control" placeholder="Password again" type="password" required>
+                  <div id='pwd2Tips' class="invalid-feedback"></div>
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn btn-block btn-primary my-4" onclick="sub_resetpassword()">Change
+                  Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% include 'auth/auth_modal.html' %}
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  var pwdPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/;
+  var success = false;
+  $("#modal-ok").click(function () {
+    if(success){
+      location.href="{% url 'auth:login' %}"
+    }
+  });
+
+  $("#new_password").change(function (event) {
+    if (!pwdPattern.test(event.target.value)) {
+      event.preventDefault();
+      event.stopPropagation();
+      $("#pwdTips").text('At least 8-16 characters, at least 1 uppercase letter, 1 lowercase letter and 1 number')
+      $("#new_password").addClass('is-invalid')
+      $("#new_password").addClass('has-danger')
+    } else {
+      $("#new_password").removeClass('is-invalid')
+      $("#new_password").removeClass('has-danger')
+      $("#new_password").addClass('is-valid')
+    }
+  })
+
+  $("#password2").change(function (event) {
+    if (event.target.value != $("#new_password").val()) {
+      event.preventDefault();
+      event.stopPropagation();
+      $("#pwd2Tips").text('The verification password is incorrect')
+      $("#password2").addClass('is-invalid')
+      $("#password2").addClass('has-danger')
+    } else {
+      $("#password2").removeClass('is-invalid')
+      $("#password2").removeClass('has-danger')
+      $("#password2").addClass('is-valid')
+    }
+  })
+
+  function sub_resetpassword() {
+    $("#new_password").change()
+    $("#password2").change()
+
+    if (!pwdPattern.test($("#new_password").val())
+      || $("#new_password").val() != $("#password2").val()) return;
+
+    $("#resetpassword_form").ajaxSubmit(function (message) {
+      tips = message.message
+
+      switch (message.code) {
+        case 200:
+          $("#modal-title").html(tips.title)
+          document.getElementById("modal-content").innerHTML = tips.body
+          $('#modal').modal()
+          success = true;
+          break;
+        case 201:
+          $("#modal-title").html(tips.title)
+          document.getElementById("modal-content").innerHTML = tips.body
+          $('#modal').modal()
+          success = false;
+          break;
+      }
+    });
+
+    return false;
+  }
+</script>
+{% endblock %}

@@ -112,3 +112,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+ARMODServers/uploadfile
+*.pyc 
+ARMODServers/templates/index/1static_index.html
+ARMODServers/templates/index/static_index.html
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build

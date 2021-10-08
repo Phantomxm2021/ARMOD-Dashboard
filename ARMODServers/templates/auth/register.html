@@ -1,0 +1,283 @@
+{% extends "authbase.html" %}
+{% load static %}
+{% block title %}
+Register a account for ARMOD dashboard
+{% endblock %}
+
+
+{% block body %}
+<!-- Main content -->
+<div class="main-content">
+  <!-- Header -->
+  <div class="header bg-gradient-primary py-9 py-lg-8 pt-lg-9">
+    <div class="container">
+      <div class="header-body text-center mb-2">
+        <div class="row justify-content-center">
+          <div class="col-xl-12 col-lg-12 col-md-12 px-5">
+            <h1 class="text-white">Create an account</h1>
+            <p class="text-lead text-white">The first step to open the AR world, create your own AR!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="separator separator-bottom separator-skew zindex-100">
+      <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1"
+        xmlns="http://www.w3.org/2000/svg">
+        <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
+      </svg>
+    </div>
+  </div>
+  <!-- Page content -->
+  <div class="container mt--8 pb-5">
+    <!-- Table -->
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card bg-secondary border-0">
+          <div class="card-body px-lg-5 py-lg-5">
+            <div class="text-center text-muted mb-4">
+              <small>Register using email</small>
+            </div>
+            <form id='register_form' role="form" action="{% url 'auth:register' %}" method='post'
+              class="needs-validation" novalidate onsubmit="return sub_register();">
+              {% csrf_token %}
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+                  </div>
+                  <input id="username" class="form-control" placeholder="Username" type="text" name='username' required>
+                  <div id="usernameTips" class="invalid-feedback"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                  </div>
+                  <input id="email" class="form-control" placeholder="Email" type="email" name='email' required>
+                  <div id='emailTips' class="invalid-feedback"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                  </div>
+                  <input id="password1" class="form-control" placeholder="Password" type="password" name='password'
+                    required>
+                  <div id='pwdTips' class="invalid-feedback"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-group input-group-merge input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                  </div>
+                  <input id="password2" class="form-control" placeholder="Password again" type="password" required>
+                  <div id='pwd2Tips' class="invalid-feedback"></div>
+                </div>
+              </div>
+
+              <div class="row my-4">
+                <div class="col-12">
+                  <div class="custom-control custom-control-alternative custom-checkbox">
+                    <input class="custom-control-input" id="privacypolicychecker" type="checkbox"
+                      name='privacypolicychecker' required>
+                    <label class="custom-control-label" for="privacypolicychecker">
+                      <span class="text-muted">I have read and agree<a href="#!"> Privacy Policy</a></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center">
+                <!-- <button id='register' type="button" onnclick="sub_register()" class="btn btn-block btn-primary my-4">注册账户</button> -->
+                <button type="button" class="btn btn-block btn-primary my-4" onclick="sub_register()">Register</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-6">
+            <a href="{% url 'auth:login' %}" class="text-light"><small>Already have an account? Go to login</small></a>
+          </div>
+          <div class="col-6 text-right">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="modal fade" id="modal-register-info" tabindex="-1" role="dialog" aria-labelledby="modal-register-info"
+      aria-hidden="true">
+      <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-register-info-title"></h6>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="text-left">
+              <div id='modal-register-info-content'>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id='modal-register-ok' type="button" class="btn btn-primary">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<!-- <script type="text/javascript" src="{% static 'js/register.js' %}"></script> -->
+
+<script type="text/javascript">
+
+  var emailPattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  var pwdPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/;
+  var success = false;
+
+  //animation tip for email field
+  $("#email").change(function (event) {
+    if (!emailPattern.test(event.target.value)) {
+      if (!event.target.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      $("#email").addClass('is-invalid')
+      $("#email").addClass('has-danger')
+      $("#emailTips").text(event.target.validationMessage)
+    }
+    else {
+      $("#email").removeClass('is-invalid')
+      $("#email").removeClass('has-danger')
+      $("#username").addClass('is-valid')
+
+    }
+  })
+
+  $("#username").change(function (event) {
+    if (!event.target.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+      $("#usernameTips").text(event.target.validationMessage)
+      $("#username").addClass('is-invalid')
+      $("#username").addClass('has-danger')
+    }
+    else {
+      $("#username").removeClass('is-invalid')
+      $("#username").removeClass('has-danger')
+      $("#username").addClass('is-valid')
+    }
+  })
+
+
+  $("#password1").change(function (event) {
+    if (!pwdPattern.test(event.target.value)) {
+      event.preventDefault();
+      event.stopPropagation();
+      $("#pwdTips").text('At least 8-16 characters, at least 1 uppercase letter, 1 lowercase letter and 1 number')
+      $("#password1").addClass('is-invalid')
+      $("#password1").addClass('has-danger')
+    } else {
+      $("#password1").removeClass('is-invalid')
+      $("#password1").removeClass('has-danger')
+      $("#password1").addClass('is-valid')
+    }
+  })
+
+  $("#password2").change(function (event) {
+    if (event.target.value != $("#password1").val()) {
+      event.preventDefault();
+      event.stopPropagation();
+      $("#pwd2Tips").text('The verification password is incorrect')
+      $("#password2").addClass('is-invalid')
+      $("#password2").addClass('has-danger')
+    } else {
+      $("#password2").removeClass('is-invalid')
+      $("#password2").removeClass('has-danger')
+      $("#password2").addClass('is-valid')
+    }
+  })
+
+  $('#modal-register-ok').click(function () {
+    $('#modal-register-info').modal('hide');
+
+    if (success)
+      window.location.href = "{% url 'auth:login' %}"    
+  })
+
+  function sub_register() {
+    if (!$("#privacypolicychecker").is(":checked")) {
+      $("#privacypolicycheckerTips").text(document.getElementById("privacypolicychecker").validationMessage)
+      $("#privacypolicychecker").addClass('is-invalid')
+      $("#privacypolicycheckerForm").addClass('has-danger')
+    } else {
+      $("#privacypolicychecker").removeClass('is-invalid')
+      $("#privacypolicycheckerForm").removeClass('has-danger')
+      $("#privacypolicychecker").addClass('is-valid')
+    }
+
+
+    $("#email").change()
+    $("#username").change()
+    $("#password1").change()
+    $("#password2").change()
+    var username = $("#username").val();
+    var email = $("#email").val();
+    var password1 = $("#password1").val();
+
+    if (!emailPattern.test(email)) {
+      document.getElementById("modal-register-info-content").innerHTML = 'E-mail format is incorrect'
+      $('#modal-register-info').modal()
+      return;
+    }
+
+    if (!pwdPattern.test(password1)
+      || !emailPattern.test(email)
+      || username == ''
+      || password1 != $("#password2").val()) return;
+
+
+    $("#register_form").ajaxSubmit(function (message) {
+      tips = message.message
+
+      switch (message.code) {
+        case 200:
+          $("#modal-register-info-title").html(tips.title)
+          document.getElementById("modal-register-info-content").innerHTML = tips.body
+          $('#modal-register-info').modal()
+          success = true;
+          break;
+        case 201:
+          $("#modal-register-info-title").html(tips.title)
+          document.getElementById("modal-register-info-content").innerHTML = tips.body
+          $('#modal-register-info').modal()
+          success = false;
+          break;
+      }
+    });
+
+    return false;
+  }
+  $(document).keyup(function (e) {
+    var key = e.which;
+    if (key == 13) {
+      sub_register()
+    }
+  });
+</script>
+{% endblock %}

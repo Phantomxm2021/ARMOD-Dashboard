@@ -1,0 +1,71 @@
+<!-- 新建项目的Modal -->
+<div class="modal fade" id="create-new-project-modal" tabindex="-1" role="dialog"
+  aria-labelledby="create-new-project-modal-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="projectModalLabel">New Showcase</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id='create_project_form' role="form" action="{% url 'applications:apps' %}" method='post'
+          class="needs-validation" novalidate onsubmit="return create_project();">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="project-text-input" class="form-control-label">Showcase Name</label>
+            <input class="form-control" type="text" placeholder="Place Example Showcase" id="showcase_name"
+              name='showcase_name'>
+          </div>
+
+          <div class="form-group">
+            <label for="project-text-input" class="form-control-label">ARExperience UID</label>
+            <input class="form-control" type="text" placeholder="3414494958" id="arexperience_uid" name='app_uid'>
+          </div>
+
+          <div class="form-group">
+            <label for="project-text-input" class="form-control-label">Permissions</label>
+            <select id='showcase_permission' class="form-control form-control-sm" name='showcase_status' value='1'>
+              <option value='0'>Private</option>
+              <option value='1' selected="selected">Public</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="descript-text-input" class="form-control-label">Brief</label>
+            <textarea class="form-control" id="showcase_brief" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="descript-text-input" class="form-control-label">Description</label>
+            <textarea class="form-control" name='showcase_description' type="text" placeholder="Describe your showcase"
+              id="showcase_description" rows="3"></textarea>
+          </div>
+
+          {% include 'dashboard/showcase_create_modal_tags.html' %}
+
+          <div class="form-group">
+            <div class="row mt-4">
+              <div class="col-9">
+                <label class="orm-control-label" for="recommend-check">Recommend</label>
+              </div>
+              <div class="col-1">
+              </div>
+              <div class="col-1">
+                <label class="custom-toggle">
+                  <input id='showcase_recommend_check' type="checkbox">
+                  <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="create_project()">Create Showcase</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 新建项目的Modal -->

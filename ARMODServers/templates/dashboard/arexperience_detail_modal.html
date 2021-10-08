@@ -1,0 +1,203 @@
+<div class="row">
+    <div class="modal fade" id="modal-project-info" tabindex="-1" role="dialog" aria-labelledby="modal-project-info"
+        aria-hidden="true">
+        <div class="modal-dialog  modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h6 class="modal-title" id="modal-project-info-title">AR Experience Detail</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <h6 class="heading-small text-muted mb-4">Basic</h6>
+                    <div class="container-fluid">
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group">
+                                        <label for="packagename-text-input" class="form-control-label">AR Experience
+                                            Name</label>
+                                        <input type="text" id='project-name-inputer'
+                                            class="form-control form-control-flush" placeholder=""
+                                            aria-describedby="edit-project-name"
+                                            style="border:none; border-bottom:1px solid #eee;border-radius: 0%; outline: none;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <small for="project-create-time" class="text-muted text-uppercase">Create
+                                            Time</small>
+                                        <br>
+                                        <small id='project-create-time'>2021-01-10 21:43:31</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <small for="project-update-time" class="text-muted text-uppercase">Update
+                                            Time</small>
+                                        <br>
+                                        <small id='project-update-time'>2021-01-10 21:43:31</small>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 识别图 -->
+                    <!-- <hr class="my-4">
+              <div class="row align-items-center">
+                <div class="col-8 mb-4">
+                  <h6 class="heading-small text-muted ">识别图 (2/6)</h6>
+                </div>
+                <div class="col-4 text-right">
+                  <form role="form" enctype="multipart/form-data">
+                    <div class="form-group">
+                      <input type="file" hidden="" class="custom-file-input" id="preview_image"
+                        onchange="onSelectedImage()" accept="image/jpg,image/jpeg">
+                      <label class="btn btn-sm btn-primary" for="preview_image">上传</label>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="pl-lg-4">
+                <ul class="list-group list-group-horizontal " id="marker_view">
+                  <li class="list-group-item">
+                    <div class="col-auto align-items-center">
+                      <img id="marker_preview" class="avatar-xl" style="width: 80px; height: 80px;object-fit: cover;"
+                        src="https://artoolkit.oss-cn-shanghai.aliyuncs.com/0/10/18/marker/Sausage.jpg">
+                      <div class="row-auto">
+  
+                      </div>
+                      <div class="row-auto text-left">
+                        <label class="mt-1"
+                          style="width:80px;height:25px;overflow:hidden;text-overflow:ellipsis;">Sausage</label>
+                      </div>
+  
+                      <div class="row-auto">
+                        <button type="button" onclick="delMarker(this)" id="20"
+                          class="btn btn-danger btn-block btn-sm">删除</button>
+                      </div>
+                    </div>
+                  </li>
+  
+                </ul>
+              </div> -->
+
+                    <!-- AR资源 -->
+                    <hr class="my-4 mt-5">
+                    <h6 class="heading-small text-muted mb-4">Assets</h6>
+                    <div class="pl-lg-4">
+                        <ul class="list-group list-group-flush list my--3">
+                            <li class="list-group-item px-0">
+                                <div class="row align-items-center">
+                                    <div class="col-1">
+                                        <span class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="fab fa-apple"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col-11">
+                                        <div class="row">
+                                            <h4 class="col-10">
+                                                <label>AR Experience Assets (iPhone)</label>
+                                            </h4>
+
+                                            <div class="col-1">
+                                                <form role="form" enctype="multipart/form-data">
+                                                    <div class="form-group">
+                                                        <input type="file" hidden="" class="custom-file-input" id="iOS"
+                                                            multiple="multiple" onchange="iosAssetsSelected()"
+                                                            accept=".json,.arexperience">
+                                                        <label class="btn btn-sm btn-primary" for="iOS">Selete</label>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <!-- asset url -->
+                                        <div class="col-12 mt--4">
+                                            <div id="asseturl-iOS">
+                                                <div class="row-6">
+                                                    <small>Json: </small>
+                                                    <small id='ios-json' class="text-break"></small>
+                                                </div>
+                                                <div class="row-6">
+                                                    <small>Bundle: </small>
+                                                    <small id='ios-bundle' class="text-break"></small>
+                                                </div>
+                                            </div>
+
+                                            <div id='spinner-iOS' style='display:none;'>
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <!-- asset url -->
+
+                                    </div>
+
+                                </div>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <div class="row align-items-center">
+                                    <div class="col-1">
+                                        <span class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="fab fa-android"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col-11">
+                                        <div class="row">
+                                            <h4 class="col-10">
+                                                <label>AR Experience Assets (Android)</label>
+                                            </h4>
+                                            <div class="col-1">
+                                                <form role="form" enctype="multipart/form-data">
+                                                    <div class="form-group">
+                                                        <input type="file" hidden="" class="custom-file-input"
+                                                            id="Android" multiple="multiple"
+                                                            onchange="androidAssetsSelected()"
+                                                            accept=".json,.arexperience">
+                                                        <label class="btn btn-sm btn-primary"
+                                                            for="Android">Selete</label>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <!-- asset url -->
+                                        <div class="col-12 mt--4">
+                                            <div id='asseturl-Android'>
+                                                <div class="row-6">
+                                                    <small>Json: </small>
+                                                    <small id='android-json' class="text-break"></small>
+                                                </div>
+                                                <div class="row-6 ">
+                                                    <small>Bundle: </small>
+                                                    <small id='android-bundle' class="text-break"></small>
+                                                </div>
+                                            </div>
+
+                                            <div id='spinner-Android' style='display:none;'>
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- asset url -->
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr class="my-4 mt-5">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-primary" id='update_arexperience'>Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

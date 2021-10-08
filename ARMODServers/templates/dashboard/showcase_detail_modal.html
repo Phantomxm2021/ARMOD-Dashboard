@@ -1,0 +1,129 @@
+{% load static %}
+
+<!-- 项目的Modal -->
+<div class="row">
+  <div class="modal fade" id="modal-project-info" tabindex="-1" role="dialog" aria-labelledby="modal-project-info"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h6 class="modal-title" id="modal-project-info-title">Showcase Detail</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="card-group">
+            <div class="card">
+              <form role="form" enctype="multipart/form-data">
+                <div class="form-group">
+                  <input type="file" hidden="" class="custom-file-input" id="showcase-header" multiple="multiple"
+                    onchange="header_Image_Selected()" accept="image/jpg,image/jpeg">
+                  <h6 class="heading-small text-muted mt-2 ml-2">Background</h6>
+                  <center>
+                    <label for="showcase-header" class="img-container ">
+                      <img class="card-img-top avatar-xxl" id='showcase_header_img' src=""
+                        onerror="javascript:this.src='{% static 'img/theme/logo_header.jpg' %}';">
+                      <div class="overlay">
+                        <span>Upload image</span>
+                      </div>
+                    </label>
+                  </center>
+                </div>
+              </form>
+
+              <div class="card-body">
+                <h6 class="heading-small text-muted mb-2"  id='showcase_uid_detail'>Basic</h6>
+                <div class="row">
+                  <div class="col-2">
+                    <div class="form-group">
+                      <input type="file" hidden="" class="custom-file-input" id="showcase-icon" multiple="multiple"
+                        onchange="iconImageSelected()" accept="image/jpg,image/jpeg">
+                      <label for="showcase-icon" class="img-container avatar-xl"> <img id='showcase_icon_img'
+                          class="card-img-top avatar avatar-xl" src=""
+                          onerror="javascript:this.src='{% static 'img/theme/logo.jpg' %}';">
+                        <div class="overlay">
+                          <span>Upload</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-1"></div>
+                  <div class="col-9">
+                    <div class="form-group">
+                      <small for="showcase_name">ShowCase Name</small>                      
+                      <input id='showcase_name_detail' type="text" class="form-control"
+                        style="border:none; border-bottom:1px solid #eee;outline: none; padding:0px" value="Place Example Showcase">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <h6 class="heading-small text-muted mb-2 mt-2">Binding ARExperience</h6>
+                  <input id='showcase_arexperience_binding_detail' class="form-control" type="text">
+                </div>
+
+                <div class="form-group">
+                  <h6 for="project-text-input" class="heading-small text-muted mb-2">Status</h6>
+                  <select id='showcase_status_detail' class="form-control form-control-sm" name='showcase_status'
+                    value='1'>
+                    <option value='0'>Offline</option>
+                    <option value='1' selected="selected">Online</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <h6 for="project-text-input" class="heading-small text-muted mb-2">Permissions</h6>
+                  <select id='showcase_permission_detail' class="form-control form-control-sm" name='showcase_status'
+                    value='1'>
+                    <option value='0'>Private</option>
+                    <option value='1' selected="selected">Public</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <h6 class="heading-small text-muted mb-2">Brief</h6>
+                  <textarea class="form-control" id="showcase_brief_detail" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <h6 class="heading-small text-muted mb-2">Description</h6>
+                  <textarea class="form-control" id="showcase_description_detail" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <h6 class="heading-small text-muted mb-2 mt-2">Tags</h6>
+                  <form>
+                    <select id='showcase_tags_detail' class="form-control" data-toggle="select" multiple
+                      data-placeholder="Select multiple options">
+                    </select>
+                  </form>
+                </div>
+
+                <div class="form-group">
+                  <div class="row mt-4">
+                    <div class="col-9 mr-4">
+                      <h6 class="heading-small text-muted mb-2 mt-2">Recommend</h6>
+                    </div>
+                    <div class="col">
+                      <label class="custom-toggle">
+                        <input id='showcase_recommend_check_detail' type="checkbox">
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-primary" onclick="save_change()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 项目的Modal -->
