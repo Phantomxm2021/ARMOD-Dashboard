@@ -19,7 +19,7 @@ default_image_url ='/static/img/theme/logo.jpg'
 
 class DashboardApplicationListView(LoginRequiredMixin, View):
     def get(self, request):
-        """获取APP列表"""
+        """Get Application list"""
         user = request.user
         app_list = cache.get(f"{user.user_uid}_get_applist")
         if app_list is None:
@@ -36,14 +36,15 @@ class DashboardApplicationListView(LoginRequiredMixin, View):
             return JsonResponse(apps,status=200)
 
     def post(self, request):
+        """Create Application"""
         method = request.POST.get('method_type')
         response = {}
         if method == 'CreateApp':
             response=self.create(request)
         return JsonResponse(response)
-    
+
     def create(self,request):
-        """创建APP"""
+        """Create APP"""
         name = request.POST.get('app_name')
     
         packageid = request.POST.get('packageid')
@@ -56,11 +57,11 @@ class DashboardApplicationListView(LoginRequiredMixin, View):
         if len(apps) > 0:
             return {'code': 201, 'message': 'The Package Name was used'}
 
-        # 使用Packageid为该应用生成Token用于验证
+        # Use Packageid to generate a Token for the application for verification
         serializer = Serializer(settings.SECRET_KEY, 8640000000)
         token = {'packageid': packageid,'user_uid':request.user.user_uid}
-        token = serializer.dumps(token)  # bytes
-        token = token.decode('utf8')  # 解码, str
+        token = serializer.dumps(token)  
+        token = token.decode('utf8')
         
         from utils.generate_random_pid import generate_unique_id
         app_uid = str(generate_unique_id(packageid))
@@ -89,7 +90,7 @@ class DashboardApplicationListView(LoginRequiredMixin, View):
    
 class DashboardApplicationDeleteView(LoginRequiredMixin, View):
     def post(self, request):
-        """删除App"""
+        """Delete Application"""
         app_uid = request.POST.get('app_uid')
         apps = ApplicationsModelV2.objects.filter(app_uid=app_uid)
         if len(apps) == 0:
@@ -101,9 +102,10 @@ class DashboardApplicationDeleteView(LoginRequiredMixin, View):
         cache.delete(f"{request.user.user_uid}_get_applist")
         return JsonResponse({'code': 200, 'message': 'Success'})
 
+
 class DashboardApplicationProjectListView(LoginRequiredMixin, View):
     def get(self, request, app_uid):
-        """用于显示App内的项目列表"""        
+        """AR experience project list"""        
         arexperience_project = cache.get(f"{request.user.user_uid}_{app_uid}_get_arexperienceList")
         if arexperience_project is None:
             arexperience_project = ARExperienceModelV2.objects.filter(app_uid=app_uid).order_by('-create_time')
@@ -114,7 +116,8 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
         appinfo = ApplicationsModelV2.objects.get(app_uid=app_uid)
         return render(request, 'dashboard/arexperience_list.html', {'arexperience_projects': arexperience_project_pages, 'appinfo': appinfo})
 
-    def post(self, request,app_uid):
+    def post(self, request, app_uid):
+        """Create new AR experience project"""
         method = request.POST.get('method_type')
         response = {}
         if method == 'CreateProject':
@@ -127,9 +130,9 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
             response = self.delete_project(request)
 
         return JsonResponse(response)
-
+        
     def create_project(self,request):
-        """创建项目"""
+        """Create proejct"""
         try:
             app_uid = request.POST.get('app_uid')
             project_name = request.POST.get('project_name')
@@ -199,7 +202,7 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
         return {'code': 200, 'message': 'success'}
 
     def delete_app(self,request):
-        """删除App"""
+        """Del App"""
         app_uid = request.POST.get('app_uid')
         apps = ApplicationsModelV2.objects.filter(app_uid=app_uid)
         if len(apps) == 0:
@@ -212,7 +215,7 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
         return {'code': 200, 'message': 'Success'}
    
     def delete_project(self,request):
-        """删除项目"""
+        """Del project"""
         project_id = request.POST.get('project_id')
         app_uid = request.POST.get('app_uid')
         project = ARExperienceModelV2.objects.get(app_uid=app_uid, project_id=project_id)
@@ -220,7 +223,7 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
         if project is None:
             return {'code': 201, 'message': 'Incorrect projecet id'}
 
-        # 1. 删除资源
+        # 1. Del assets
         from utils.aliyun_utility import AliyunObjectStorage
 
         aliyun_oss = AliyunObjectStorage()
@@ -243,7 +246,7 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
             if aliyun_oss.exists(project.project_header[sub_url_start_index:]):
                 aliyun_oss.delete(project.project_header[sub_url_start_index:])
         
-        # 2.删除项目
+        # 2.Del project
         project.delete()
 
         app = ApplicationsModelV2.objects.get(user_uid=request.user.user_uid,app_uid=app_uid)

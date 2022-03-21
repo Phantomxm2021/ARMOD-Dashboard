@@ -26,10 +26,10 @@ dashboard_project_detail_field = ['project_id','project_name','app_uid','project
 
 dashboard_project_asset_detail_field =['project_id','json_url','bundle_url','bundle_size','platform_type',
                                        'create_time','update_time']
+
 class DashboardProjectListView(LoginRequiredMixin, View):
     def get(self, request, app_uid, arexperience_uid):
-        """显示ARExperiences项目详情"""
-        
+        """Show ARExperiences project detail"""
         query_key = f"{request.user.user_uid}_{app_uid}_{arexperience_uid}"
         data = cache.get(query_key)
         
@@ -59,7 +59,7 @@ class DashboardProjectListView(LoginRequiredMixin, View):
             response = self.upload_ar_resources(request)
 
         return JsonResponse(response)
-        
+
     def update_project(self,request):
         ret = {'code':200,'message':None,'data':None}
         project_name = request.POST.get('project_name')   
@@ -165,25 +165,17 @@ class DashboardProjectListView(LoginRequiredMixin, View):
         query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_arexperiencebytagslist"
         cache.delete(query_by_app_uid_cache_key)
 
-
-        # api_query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_showcaseList"
-        # api_query_arexperience=f"api_{request.user.user_uid}_{app_uid}_{project_id}_get_arexperience"
-        # cache.delete(api_query_by_app_uid_cache_key)
-        # cache.delete(api_query_arexperience)
-
         ret['code'] = 200
         ret['message'] = 'Success'
         return ret
 
     def upload_ar_resources(self,request):
-        """上传/更新ARExperiences资源"""
+        """Upload ARExperiences"""
         try:
             app_uid = request.POST.get('app_uid')
             project_id = request.POST.get('project_id')
-            # project_name = request.POST.get('project_name')
             platform = request.POST.get('platform')
-            filesIndex = ['arexperience', 'json']
-            print(project_id)
+            filesIndex = ['arexperience', 'json'] 
             files = []
             file_size = 0
             upload_response = ''
@@ -231,11 +223,6 @@ class DashboardProjectListView(LoginRequiredMixin, View):
             cache.delete(query_app_uid_key)
             cache.delete(query_key)
             
-
-            # api_query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_showcaseList"
-            # api_query_arexperience=f"api_{request.user.user_uid}_{app_uid}_{project_id}_get_arexperience"
-            # cache.delete(api_query_by_app_uid_cache_key)
-            # cache.delete(api_query_arexperience)
             query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_arexperiencebytagslist"
             cache.delete(query_by_app_uid_cache_key)
             cache.delete(f"api_{project_id}_get_arexperience_detail")

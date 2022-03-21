@@ -2,14 +2,21 @@ from django.db import models
 from db.base_model import BaseModel
 from django.core.cache import cache
 # Create your models here.
+
+def getJSONFieldDefault():
+    return []
+
 class ARExperienceModel(BaseModel):
-    """应用信息"""
-    arexperience_uid = models.BigIntegerField(null=True,blank=True,db_index=True,verbose_name='AR体验项目的ID')
-    name = models.CharField(max_length = 64,unique=True,db_index=True,verbose_name='项目名称')
-    app_uid = models.BigIntegerField(default = -1,db_index=True,verbose_name='所属应用的Id')
-    # user_uid =  models.IntegerField(default = -1,db_index=True,verbose_name='User uid')
-    status = models.IntegerField(default = 1,db_index=True,verbose_name='项目状态')
-    description = models.CharField(default='',max_length = 128,verbose_name='项目描述')   
+    """ARExperience model
+
+    Args:
+        BaseModel ([BaseModel]): Abstract model
+    """
+    arexperience_uid = models.BigIntegerField(default = -1,primary_key=True,db_index=True,verbose_name='AR Experience Id')
+    name = models.CharField(max_length = 64,unique=True,db_index=True,verbose_name='AR Experience Name')
+    app_uid = models.BigIntegerField(default = -1,db_index=True,verbose_name='App Id')
+    status = models.IntegerField(default = 1,db_index=True,verbose_name='AR Experience Project Status')
+    description = models.CharField(default='',max_length = 128,verbose_name='AR Experience Descriptor')   
     class Meta:
         db_table = 'armod_arexperiences'
         verbose_name = 'ARExperiences'
@@ -17,26 +24,30 @@ class ARExperienceModel(BaseModel):
 
   
 class ARExperienceAsset(BaseModel):
-    arexperience_uid =  models.BigIntegerField(null=True,db_index=True,verbose_name='所属项目的Id')
-    android_json= models.CharField(max_length = 128,verbose_name='android json')   
-    android_bundle= models.CharField(max_length = 128,verbose_name='android bundle')   
-    android_bundle_size = models.FloatField(default = -1,verbose_name='android bundle size')
-    ios_json= models.CharField(max_length = 128,verbose_name='ios json')   
-    ios_bundle= models.CharField(max_length = 128,verbose_name='ios bundle')
-    ios_bundle_size = models.FloatField(default = -1,verbose_name='ios bundle size')
+    """ARExperience Assets Model
+
+    Args:
+        BaseModel ([BaseModel]): Abstract model
+    """
+    arexperience_uid =  models.BigIntegerField(default = -1,db_index=True,verbose_name='AR Experience Id')
+    android_json= models.CharField(max_length = 128,verbose_name='Android Json')   
+    android_bundle= models.CharField(max_length = 128,verbose_name='Android Bundle')   
+    android_bundle_size = models.FloatField(default = -1,verbose_name='Android Bundle Size')
+    ios_json= models.CharField(max_length = 128,verbose_name='iOS Json')   
+    ios_bundle= models.CharField(max_length = 128,verbose_name='iOS Bundle')
+    ios_bundle_size = models.FloatField(default = -1,verbose_name='iOS Bundle Size')
     class Meta:
         db_table = 'armod_arexperience_assets'
         verbose_name = 'ARExperience Assets'
         verbose_name_plural = verbose_name
 
-# Create your models here.
-def getJSONFieldDefault():
-    return []
+
+
 
 
 class ARExperienceModelV2(BaseModel):
     """ARExperience"""
-    app_uid = models.BigIntegerField(default = -1,db_index=True,verbose_name='所属应用的Id')
+    app_uid = models.BigIntegerField(default = -1,db_index=True,verbose_name='AR Experience Id')
     user_uid = models.BigIntegerField(default=-1, db_index=True, verbose_name='User uid')
     project_id = models.BigIntegerField(default=-1, db_index=True, unique=True, verbose_name='Showcase uid')
     project_name = models.CharField(max_length=16, default='',db_index=True, unique=True, verbose_name='Showcase name')
@@ -60,7 +71,7 @@ class ARExperienceModelV2(BaseModel):
 
 
 class ARExperienceResourceV2(BaseModel):
-    project_id =  models.BigIntegerField(null=True,db_index=True,verbose_name='所属项目的Id')
+    project_id =  models.BigIntegerField(null=True,db_index=True,verbose_name='AR Experience Id')
     json_url= models.CharField(max_length = 128,verbose_name='android json')   
     bundle_url= models.CharField(max_length = 128,verbose_name='android bundle')   
     bundle_size = models.FloatField(default = -1,verbose_name='android bundle size')
@@ -74,7 +85,7 @@ class ARExperienceResourceV2(BaseModel):
 
 
 class Statistics(models.Model):
-    pv = models.IntegerField(default=0,verbose_name="浏览次数")
-    uv = models.IntegerField(default=0,verbose_name="浏览人数")
+    pv = models.IntegerField(default=0,verbose_name="UV")
+    uv = models.IntegerField(default=0,verbose_name="PV")
     date = models.CharField(max_length=200)
-    project_id =  models.BigIntegerField(null=True,db_index=True,verbose_name='所属项目的Id')
+    project_id =  models.BigIntegerField(null=True,db_index=True,verbose_name='AR Experience Id')

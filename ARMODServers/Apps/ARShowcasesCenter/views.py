@@ -41,7 +41,7 @@ class ARShowcasesCenterView(LoginRequiredMixin, View):
 
 class ARShowcasesCenterProjectPostView(LoginRequiredMixin, View):
     def post(self, request):
-        """创建Case"""
+        """AR Showcase operation"""
         action = request.POST.get('action')
         app_uid = request.POST.get('app_uid')
         showcase_uid = request.POST.get('showcase_uid')

@@ -18,38 +18,41 @@ from django.template.loader import render_to_string
 
 
 class RegisterView(View):
-    """Register user"""
+    """Register"""
 
     def get(self, request):
+        # Draw register view
         return render(request, 'auth/register.html')
 
     def post(self, request):
+        # Register processing
+        # Receive data
         username = request.POST.get('username')
         password = request.POST.get('password')
         email = request.POST.get('email')
         allow = request.POST.get('privacypolicychecker')
 
         if not all([username, password, email]):
-            # 数据不完整incomplete data
-            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'incomplete data'}})
+            # incomplete data
+            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'Incomplete data'}})
 
-         # Check e-mail
+         # Check mailbox
         if not re.match(r'^[a-z0-9][\w.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
-            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'Email address is incorrect'}})
+            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'Incorrect email'}})
 
         if allow != 'on':
-            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'Please agree to the Privacy Policy first'}})
+            return JsonResponse({'code': 201, 'message': {'title': 'ERROR', 'body': 'Please agree to the Privacy agreement'}})
 
-        # Check for duplicate users
+        # Check if the user is already
         try:
             user = User.objects.filter(
                 Q(username=username) | Q(email=email)).first()
         except:
             user = None
         if user is not None:
-            return JsonResponse({'code': 201, 'message':  {'title': 'ERROR', 'body': 'user already exists'}})
+            return JsonResponse({'code': 201, 'message':  {'title': 'ERROR', 'body': 'User already exists'}})
 
-        # Perform business processing: perform user registration
+        # Business processing: user registration
         from utils.generate_random_pid import generate_unique_id
         user = User.objects.create_user(user_uid=generate_unique_id(
             email), username=username, email=email, password=password)
@@ -57,60 +60,55 @@ class RegisterView(View):
         user.save()
 
         # Send activation link, including activation link: http://127.0.0.1:8000/user/active/5
-        # The activation link needs to contain the user's identity information, and the identity information should be encrypted
-        # Activation link format: /user/active/user identity encrypted information /user/active/token
-
-        # Encrypt the user's identity information and generate an activation token
+        # The activation link needs to include the user's identity information, and the identity information should be encrypted
+        # Activation link format: /user/active/User ID encrypted information /user/active/token
+        # Encrypt the user’s identity information and generate an activation token
         serializer = Serializer(settings.SECRET_KEY, 900)
         info = {'confirm': user.user_uid}
-        token = serializer.dumps(info)
-        token = token.decode('utf8') 
+        token = serializer.dumps(info) 
+        token = token.decode('utf8')
 
-        # Send email asynchronously
+        # Send mail
         full_url = 'https://%s/%s/%s' % (
             Site.objects.get_current().domain, 'auth/activation', token)
 
-        message = '我们已收到您注册 XRMOD 的请求。如果邮箱是自用的，请点击下方按钮进行验证。如果不是你，请忽略。'
+        message = 'We have received your request to register for ARMOD. If the email is for your own use,please click the button below to verify it. If it is not you, please ignore it.'
         html_message = render_to_string('activate_email_template.html', {
-                                        'username': username, 'url': full_url, 'title': '感谢您注册XRMOD', 'content': message})
+                                        'username': username, 'url': full_url, 'title': 'Thank you for your register ARMOD', 'content': message})
         send_register_active_email.delay(email, html_message)
 
-        # Return to response, jump to home page
-        return JsonResponse({'code': 200, 'message': {'title': 'Success', 'body': '账户注册成功，请前往邮箱激活'}, 'url': reverse('auth:login')})
+        # go to index view
+        return JsonResponse({'code': 200, 'message': {'title': 'Success', 'body': 'Account registration is successful'}, 'url': reverse('auth:login')})
 
 
-# /user/active/token
+
 class ActiveView(View):
     """User active"""
 
     def get(self, request, token):
-        # do user activation
-        # Decrypt to get the user information to be activated
+        # Perform user activation
+        # Decrypt and get the user information to be activated
         serializer = Serializer(settings.SECRET_KEY, 900)
         try:
             info = serializer.loads(token)
             # Get the id of the user to be activated
             user_uid = info['confirm']
 
-            # Get user information by id
+            # Get user information according to id
             user = User.objects.get(user_uid=user_uid)
             user.is_active = 1
             user.save()
 
-            # Jump to login page
+            # Go to login view
             return redirect(reverse('auth:login'))
         except SignatureExpired as e:
-            # Activation link has expired
             return HttpResponse('The activation link has expired')
 
 
-# /user/login
 class LoginView(View):
     """Login"""
 
     def get(self, request):
-        # show login page
-        # Determine whether to remember the password
         if 'email' in request.COOKIES:
             email = request.COOKIES.get('email')
             checked = 'checked'
@@ -154,6 +152,7 @@ class CustomBackend(ModelBackend):
 # /user/logout
 class LogoutView(View):
     """Logout"""
+
     def get(self, request):
         logout(request)
         return redirect(reverse('auth:login'))
@@ -182,10 +181,10 @@ class ForgotPasswordView(View):
 
         serializer = Serializer(settings.SECRET_KEY, 900)
         info = {'reset': email}
-        token = serializer.dumps(info) 
+        token = serializer.dumps(info)  
         token = token.decode('utf8')  
 
-        # Send email asynchronously
+        # Send mail
         full_url = 'https://%s/%s/%s' % (
             Site.objects.get_current().domain, 'auth/resetpassword', token)
         message = 'We have received your request to reset password for ARMOD. If the email is for your own use,please click the button below to verify it. If it is not you, please ignore it.'

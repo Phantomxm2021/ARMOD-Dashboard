@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='arexperiencemodel',
             name='arexperience_uid',
-            field=models.BigIntegerField(null=True,blank=True,db_index=True, primary_key=False, serialize=False, verbose_name='AR体验项目的ID'),
+            field=models.BigIntegerField(db_index=True, default=-1, primary_key=True, serialize=False, verbose_name='AR体验项目的ID'),
         ),
     ]
