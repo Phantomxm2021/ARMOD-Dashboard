@@ -27,6 +27,7 @@ def send_register_active_email(to_email, html_message):
     message = ''
     sender = settings.EMAIL_PROM  # SENDER
     receiver = [to_email]
+<<<<<<< HEAD
     send_mail(subject, message, sender, receiver, html_message=html_message)
 
 
@@ -59,3 +60,6 @@ def generate_static_index_html():
     save_path = os.path.join(settings.BASE_DIR, 'templates/index/static_index.html')
     with open(save_path, 'wb') as f:
         f.write(static_index_html)
+=======
+    send_mail(subject, message, sender, receiver, html_message=html_message)
+>>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)

@@ -1,25 +1,33 @@
-{% for tag in all_preset_tags %}
-<tr>
-    <th scope="row">
-        <span class="name mb-0 text-sm">{{tag.tag_name}}</span>
-    </th>
-
-    <td>
-        <span class="text">{{tag.tag_sort_weight}}</span>
-    </td>
-
-    <td>
-        <span class="text">{{tag.tag_reference_weight}}</span>
-    </td>
-
-    <td>
-        <span class="text">{{tag.create_time}}</span>
-    </td>
-
-    <td class="table-actions text-right">
-        <button class="btn btn-icon-only btn-sm" type="button" onclick="deletetag('{{tag.tag_name}}')">
-            <i class="ni ni-fat-remove"></i>
-        </button>
-    </td>
-</tr>
-{% endfor %}
+<div class="table-responsive" id='showcase_tags_table_body'>
+    <table class="table align-items-center table-flush">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="sort" data-sort="name">Tag Name</th>
+                <th scope="col" class="sort" data-sort="budget">Sort Weight</th>
+                <th scope="col" class="sort" data-sort="budget">reference</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody class="list">
+            {% for tag in all_preset_tags %}
+            <tr>
+                <th scope="row">
+                    <span class="name mb-0 text-sm">{{tag.tag_name}}</span>
+                </th>
+                <td>
+                    <span class="text">{{tag.tag_sort_weight}}</span>
+                </td>
+                <td>
+                    <span class="text">{{tag.tag_reference_weight}}</span>
+                </td>
+                <td class="table-actions text-right">
+                    <a type="button" class="btn btn-icon-only btn-sm text-light" data-toggle="modal"
+                        onclick="delete_tag('{{tag.tag_name}}');" data-target="#modal-notification">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

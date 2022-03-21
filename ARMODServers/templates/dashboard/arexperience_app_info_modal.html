@@ -13,35 +13,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row justify-content-around">
-                            <div class="col-md-4">
 
-                                <input type="file" hidden="" class="custom-file-input" id="app_icon_image"
-                                    multiple="multiple" accept="image/jpg,image/jpeg">
-                                <label for="app_icon_image" class="img-container avatar-155">
-                                    <img id="app_icon_image_display" class="card-img-top avatar avatar-155"
-                                        src="{{appinfo.app_icon_image}}"
-                                        onerror="javascript:this.src='/static/img/theme/logo.jpg';">
-                                    <div class="overlay">
-                                        <span>Upload</span>
-                                    </div>
-                                </label>
-                            </div>
+                        <div class="text-left">
 
-                            <div class="col-md-8">
-
+                            <div class="form-group">
                                 <label for="packagename-text-input" class="form-control-label">Package Name</label>
                                 <input class="form-control" type="text" value="{{appinfo.packageid}}"
                                     id="packagename-text-input" disabled>
-
-                                <label for="createtime-text-input" class="form-control-label">Create Time</label>
-                                <input class="form-control" type="text" value="{{appinfo.create_time}}"
-                                    id="createtime-text-input" disabled>
-
                             </div>
-                        </div>
-                        <div class="text-left">
-
 
                             <div class="form-group">
                                 <label for="token" class="form-control-label">Token</label>
@@ -57,10 +36,18 @@
                                 <textarea class="form-control" id="descriptFormControlTextarea1" rows="2"
                                     disabled>{{appinfo.description}}</textarea>
                             </div>
+                           
+                            <div class="form-group">
+                                <label for="createtime-text-input" class="form-control-label">Create Time</label>
+                                <input class="form-control" type="text" value="{{appinfo.create_time}}"
+                                    id="createtime-text-input" disabled>
+                            </div>
                         </div>
+
+
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-primary" id='update_app_detail'>Save</button>
+
                     </div>
                 </div>
             </div>

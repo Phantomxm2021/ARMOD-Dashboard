@@ -40,6 +40,7 @@ class ARExperienceAsset(BaseModel):
         db_table = 'armod_arexperience_assets'
         verbose_name = 'ARExperience Assets'
         verbose_name_plural = verbose_name
+<<<<<<< HEAD
 
 
 
@@ -89,3 +90,5 @@ class Statistics(models.Model):
     uv = models.IntegerField(default=0,verbose_name="PV")
     date = models.CharField(max_length=200)
     project_id =  models.BigIntegerField(null=True,db_index=True,verbose_name='AR Experience Id')
+=======
+>>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
