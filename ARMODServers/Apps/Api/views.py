@@ -24,7 +24,7 @@ class ARExperienceView(APIView):
     throttle_classes = [VisitThrottle, ]
 
     def post(self, request, *args, **kwargs):
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         try:
             arexperience_uid = request._request.POST.get('arexperience_uid')
             cache_key = f"api_{arexperience_uid}_get_arexperience"
@@ -60,7 +60,7 @@ class ARShowcaseView(APIView):
 
     def post(self, request, *args, **kwargs):
         # respone dict
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         try:
             showcase_tag = request._request.POST.get('showcase_tag')
             showcase_status = request._request.POST.get('showcase_status', 1)
@@ -108,7 +108,7 @@ class ARShowcaseDetailView(APIView):
 
     def post(self, request, *args, **kwargs):
         # respone dict
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         if 'showcase_uid' in request._request.POST:
             showcase_uid = request._request.POST.get('showcase_uid', None)
             query_showcase_detail_key = f"api_{request.user.user_uid}_{request.auth[0]}_{showcase_uid}_get_detail"
@@ -139,7 +139,7 @@ class ARShowcaseTagsView(APIView):
     throttle_classes = [VisitThrottle, ]
 
     def post(self, request, *args, **kwargs):
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         query_showcase_tags_key = f"api_{request.user.user_uid}_{request.auth[0]}_get_tags"
         tags = cache.get(query_showcase_tags_key)
         if tags is None:
@@ -157,7 +157,7 @@ class ARShowcaseRecommends(APIView):
     throttle_classes = [VisitThrottle, ]
 
     def post(self, request, *args, **kwargs):
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         try:
             query_showcase_recommend_key = f"api_{request.user.user_uid}_{request.auth[0]}_get_recommendList"
             recommends = cache.get(query_showcase_recommend_key)
@@ -180,7 +180,7 @@ class ARShowcasePublicView(APIView):
     throttle_classes = [VisitThrottle, ]
 
     def post(self, request, *args, **kwargs):
-        ret = {'code': 200, 'msg': '', 'data': None}
+        ret = {'code': 200, 'msg': None, 'data': None}
         query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{request.auth[0]}_1_1_get_showcaseList"
         showcases = cache.get(query_by_app_uid_cache_key)
         if showcases is None:
@@ -193,3 +193,10 @@ class ARShowcasePublicView(APIView):
                       showcases, settings.API_CACHE_EXPIRED)
         ret['data'] = showcases
         return JsonResponse(ret)
+
+
+class CreateARExperience(APIView):
+    authentication_classes = [AuthticationWithoutPackageId, ]
+    throttle_classes = [VisitThrottle, ]
+    def post(self,*args,**kwargs):
+        pass

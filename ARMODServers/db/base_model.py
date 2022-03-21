@@ -1,10 +1,10 @@
 from django.db import models
 
 class BaseModel(models.Model):
-    """Abstract Model"""
-    create_time = models.DateTimeField(auto_now_add=True,null=True, verbose_name='Create Time')
-    update_time = models.DateTimeField(auto_now=True, null=True,verbose_name='Update Time')
-    is_delete = models.BooleanField(default=False, verbose_name='Delete Flag')
+    """模型抽象基类"""
+    create_time = models.DateTimeField(auto_now_add=True,null=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, null=True,verbose_name='更新时间')
+    is_delete = models.BooleanField(default=False, verbose_name='删除标记')
 
     class Meta:
-        abstract = True
+        abstract = True  # 说明是一个抽象模型类

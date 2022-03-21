@@ -36,7 +36,7 @@ def get_package_id(request):
 
 
 class Authtication(BasicAuthentication):
-    """API Authentication"""
+    """API 鉴权"""
     keyword = 'Token'
     model = None
     loaded_token = None
@@ -100,7 +100,7 @@ class Authtication(BasicAuthentication):
 
 
 class AuthticationWithoutPackageId(BasicAuthentication):
-    """API Authentication"""
+    """API 鉴权"""
     keyword = 'Token'
     model = None
     loaded_token = None

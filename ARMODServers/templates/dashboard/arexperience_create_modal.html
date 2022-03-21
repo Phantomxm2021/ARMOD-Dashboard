@@ -1,4 +1,3 @@
-
 <!-- 新建项目的Modal -->
 <div class="modal fade" id="create-new-project-modal" tabindex="-1" role="dialog"
   aria-labelledby="create-new-project-modal-label" aria-hidden="true">
@@ -16,24 +15,17 @@
           {% csrf_token %}
           <div class="form-group">
             <label for="project-text-input" class="form-control-label">ARExperience Name</label>
-            <input class="form-control" type="text" placeholder="Place Example" id="projectname" name='projectname'>
+            <input class="form-control" type="text" placeholder="Place Example" id="project_name" name='project_name'>
           </div>
-          <!-- <div class="form-group">
-            <label for="project-text-input" class="form-control-label">Permissions</label>
-            <select id='competence' class="form-control form-control-sm" name='competence' value='1'>
-              <option value='0'>Private</option>
-              <option value='1' selected="selected">Public</option>
-            </select>
-          </div> -->
           <div class="form-group">
             <label for="descript-text-input" class="form-control-label">Description</label>
-            <textarea class="form-control" name='projectdescription' type="text" placeholder="Describe your application"
-              id="projectdescription" rows="3"></textarea>
+            <textarea class="form-control" name='description' type="text" placeholder="Describe your application"
+              id="description" rows="3"></textarea>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="createproject()">Create ARExperience</button>
+        <button type="button" class="btn btn-primary" id="create_project_btn">Create ARExperience</button>
       </div>
     </div>
   </div>

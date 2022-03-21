@@ -10,14 +10,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='arexperiencemodel',
-            name='id',
-        ),
+        
         migrations.AddField(
             model_name='arexperiencemodel',
             name='pid',
-            field=models.IntegerField(db_index=True, default=-1, primary_key=True, serialize=False, verbose_name='AR体验项目的ID'),
+            field=models.IntegerField(db_index=True, default=-1, primary_key=False, serialize=False, verbose_name='AR体验项目的ID'),
         ),
         migrations.AlterField(
             model_name='arexperienceasset',

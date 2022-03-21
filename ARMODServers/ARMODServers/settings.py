@@ -46,8 +46,11 @@ INSTALLED_APPS = [
     'Apps.Users',
     'Apps.Applications',
     'Apps.ARExperiences',
+    'Apps.TagManager',
     'Apps.ARShowcasesCenter',
     'Apps.Api',
+    'Apps.Apiv2',
+    'Apps.Index',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ARMODServers.wsgi.application'
 
+# Rest framework setting
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser',
                                'rest_framework.parsers.FormParser',
@@ -97,8 +101,11 @@ REST_FRAMEWORK = {
         'anon': '10000/day',
         'user': '10000/day',
         'api': '10000/day'
-    }
+    },
+    'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10 
 }
+
 
 
 # Database
@@ -110,8 +117,7 @@ DATABASES = {
         'NAME': 'armod_db',
         'USER': 'armod_admin',
         'PASSWORD': 'Admin@ARMOD',
-        'HOST': 'rm-uf632120sr3gy67kl.mysql.rds.aliyuncs.com',  # Product
-        # 'HOST':'rm-uf632120sr3gy67kl4o.mysql.rds.aliyuncs.com', # Test
+        'HOST': 'rm-uf632120sr3gy67kl.mysql.rds.aliyuncs.com',  # Your mysql address
         'PORT': '3306',
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -121,7 +127,7 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
-# Model class used by django authentication system
+# django Model classes used by the authentication system
 AUTHENTICATION_BACKENDS = (
     'Users.views.CustomBackend',
 )
@@ -172,35 +178,35 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_collections')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 
-# Media file path
+# media file path
 MEDIA_ROOT = os.path.join(BASE_DIR, 'meida')
 IMAGE_ROOT = os.path.join(MEDIA_ROOT, 'images')
 IMAGE_URL = 'images'
 AREXPERIENCE_ROOT = os.path.join(MEDIA_ROOT, 'arexperiences')
 AREXPERIENCE_URL = 'arexperiences'
 
-# Aliyun OSS
-OSS_ACCESS_KEY_ID = "YOUR_OSS_ACCESS_KEY_ID"
-OSS_ACCESS_KEY_SECRET = "YOUR_OSS_ACCESS_KEY_SECRET"
-OSS_ENDPOINT="YOUR_OSS_END_POINT"
-OSS_BUCKET_NAME = "YOUR_BUCKET_NAME"
-ALIYUN_OSS_ACCESS_URL = 'YOUR_ALIYUN_OSS_ACCESS_URL'
-OSS_BASE_URL = 'YOUR_OSS_BASE_URL'
+# Alibaba Cloud OSS
+OSS_ACCESS_KEY_ID = "LTAI5tAbsG92RxjUs8VSZ3Fx"
+OSS_ACCESS_KEY_SECRET = "aXxjIl8CK8X9cisgYzJ4uvY8myLfOO"
+OSS_ENDPOINT = "oss-cn-shanghai-internal.aliyuncs.com"
+OSS_BUCKET_NAME = "armod-assets-cn"
+ALIYUN_OSS_ACCESS_URL = ''
+OSS_BASE_URL = 'https://assets.cn.weacw.com/'
+BASE_WEBSITE_URL= 'https://phantomsxr.cn'
 
-
-# Email config
+# send mail configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# Whether to use TLS secure transmission protocol (used to provide confidentiality and data integrity between two communication applications.)
-EMAIL_USE_TLS = False                    # Use TLS
-EMAIL_USE_SSL = True                     # Use SSL
-EMAIL_HOST = 'YOUR_SMTP_SERVER'          # SMTP server
-EMAIL_PORT = 465                         # SMTP server port
-EMAIL_HOST_USER = 'YOUR_SENDER_EMAIL'    # Sender
-EMAIL_HOST_PASSWORD = 'YOUR_PASSWORD'    # Password
-EMAIL_PROM = 'YOUR_SENDER_INFOMATION'    # Sender infomation, e.g. ARMOD<no-reply@phantonsxr.com>
+# Whether to use the TLS secure transport protocol (used to provide confidentiality and data integrity between two communicating applications.)
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True                            # Whether to use SSL encryption, qq enterprise mailbox requires the use of
+EMAIL_HOST = 'smtp.exmail.qq.com'               # The SMTP server of the mailbox that sends the mail
+EMAIL_PORT = 465                                # SMTP server port for outbox
+EMAIL_HOST_USER = 'no-reply@phantomsxr.com'     # Email address to send email to
+EMAIL_HOST_PASSWORD = 'qSt4AF6NfHd539A6'        # Email password for sending emails (authorization code is used here)
+EMAIL_PROM = 'XRMOD<no-reply@phantomsxr.com>'   # The sender that the recipient sees
 
 
-# Django's cache configuration, use redis
+# Django's cache configuration, using redis
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -212,11 +218,11 @@ CACHES = {
 }
 
 
-# Session cache
+# Configure session storage
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
-# Redis Cache expiration time
+# API Redis cache expiration time
 API_CACHE_EXPIRED = 3600
 
-# Login url address
+# Configure the login url address
 LOGIN_URL = '/auth/login'

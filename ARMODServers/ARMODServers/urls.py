@@ -21,6 +21,15 @@ urlpatterns = [
     path('auth/', include('Apps.Users.urls', namespace='auth')),
     path('dashboard/', include('Apps.Applications.urls', namespace='applications')),
     path('dashboard/', include('Apps.ARExperiences.urls', namespace='arexperiences')),
-    path('dashboard/', include('Apps.ARShowcasesCenter.urls', namespace='arshowcasescenter')),       
+    path('dashboard/', include('Apps.TagManager.urls', namespace='tagmanager')),  
+
+    # path('dashboard/', include('Apps.ARShowcasesCenter.urls', namespace='arshowcasescenter')),       
+    # path('assetsmanager/', include('Apps.AssetsManager.urls', namespace='assetsmanager')),  
     path('api/v1/',include('Apps.Api.urls', namespace='api')),
+    path('api/v2/',include('Apps.Apiv2.urls', namespace='apiv2')),
+
+
+    #last 
+    path('',include('Apps.Index.urls', namespace='index')),
+
     ]

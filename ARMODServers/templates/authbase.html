@@ -38,7 +38,7 @@
 <body class="bg-default">
     <nav id="navbar-main" class="navbar navbar-horizontal navbar-transparent navbar-main navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'index:index' %}">
                 <img src="{% static 'img/brand/white.png' %}">
             </a>
             <!-- 适配手机 -->
@@ -125,14 +125,13 @@
     {% endblock %}
 
 
-
     <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery.form.js' %}"></script> 
     <script src="{% static 'vendor/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'vendor/js-cookie/js.cookie.js' %}"></script>
     <script src="{% static 'vendor/jquery.scrollbar/jquery.scrollbar.min.js' %}"></script>
     <script src="{% static 'vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js' %}"></script>
     <script src="{% static 'js/argon.js' %}"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
     {% block js%}
 
     {% endblock %}

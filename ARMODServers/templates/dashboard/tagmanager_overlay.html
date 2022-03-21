@@ -1,0 +1,77 @@
+<div id="side-drawer-full" class="position-fixed">
+  <div class="h-100 bg-white">
+    <div class="scrollbar-inner">
+      <div class="card">
+        {% csrf_token %}
+        <!-- Card header -->
+        <div class="card-header">
+          <div class="row">
+            <h3 class="col-sm lang" key="text_tag_manager_title">Application List</h3>
+            <div class="col-sm text-right">
+              <button class="btn btn-sm btn-outline-default lang" key="text_tag_manager_new_tag_btn"
+                data-target="#create-new-tags-modal" data-toggle="modal">NEW
+                APP</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col" class="sort lang" data-sort="name" key="text_tag_manager_table_name">Name</th>
+                <th scope="col" class="sort lang" data-sort="budget" key="text_tag_manager_table_weight">Weight</th>
+                <th scope="col" class="sort lang" data-sort="status" key="text_tag_manager_table_reference">Reference
+                </th>
+                <th scope="col" class="sort lang" data-sort="status" key="text_tag_manager_table_create_time">Create
+                  Time
+                </th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody class="list" id="tag_manager_container">
+             
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Card footer -->
+        <div class="card-footer py-4">
+          {% if applist.has_other_pages %}
+          <nav aria-label="...">
+            <ul class="pagination justify-content-end mb-0">
+              {% if applist.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ applist.previous_page_number }}" tabindex="-1">
+                  <i class="fas fa-angle-left"></i>
+                  <span class="sr-only">Previous</span>
+                </a>
+              </li>
+              {% endif %}
+              {% for page_num in applist.paginator.page_range %}
+              {% if page_num == applist.number %}
+              <li class="page-item active">
+                {% else %}
+              <li class="page-item">
+                {% endif %}
+                <a class="page-link" href="?page={{page_num}}">{{page_num}}</a>
+              </li>
+              {% endfor %}
+              {% if applist.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ applist.next_page_number }}">
+                  <i class="fas fa-angle-right"></i>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="side-drawer-full-void" class="position-fixed d-none" onclick="closeTagManagerSideDrawer()"></div>
+
+{% include 'dashboard/showcase_tags_modal.html' %}
