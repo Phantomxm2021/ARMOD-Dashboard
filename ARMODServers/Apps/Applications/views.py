@@ -1,16 +1,21 @@
-from django.conf import settings
+from struct import pack
 from django.conf import settings
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.views.generic import View
 from utils.mixin import LoginRequiredMixin
-from django.shortcuts import render, redirect
-from Apps.Applications.models import ApplicationsModel
-from Apps.ARExperiences.models import ARExperienceModel, ARExperienceAsset
+from django.shortcuts import render
+from Apps.Applications.models import ApplicationsModelV2
+from Apps.ARExperiences.models import ARExperienceModelV2, ARExperienceResourceV2
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
+from django.core.paginator import Paginator
+import os
+import json
+from utils.create_md5 import create_md5
+from django.db.models import Q
 # Create your views here.
 
+default_image_url ='/static/img/theme/logo.jpg'
 
 class DashboardApplicationListView(LoginRequiredMixin, View):
     def get(self, request):
@@ -18,17 +23,20 @@ class DashboardApplicationListView(LoginRequiredMixin, View):
         user = request.user
         app_list = cache.get(f"{user.user_uid}_get_applist")
         if app_list is None:
-            app_list = ApplicationsModel.objects.filter(user_uid=user.user_uid)
+            app_list = ApplicationsModelV2.objects.filter(user_uid=user.user_uid).order_by('-create_time')
             cache.set(f"{user.user_uid}_get_applist",app_list,settings.API_CACHE_EXPIRED)
         page = int(request.GET.get("page", 1))
-        paginator = Paginator(app_list, 10)
+        paginator = Paginator(app_list, 12)
         page = request.GET.get('page')
         apps = paginator.get_page(page)
-        return render(request, 'dashboard/application_list.html', {'applist': apps,'user':user})
+        render_page = request.GET.get("render", True)
+        if render_page:
+            return render(request, 'dashboard/application_list.html', {'applist': apps,'user':user})
+        else:
+            return JsonResponse(apps,status=200)
 
     def post(self, request):
         """Create Application"""
-<<<<<<< HEAD
         method = request.POST.get('method_type')
         response = {}
         if method == 'CreateApp':
@@ -39,50 +47,52 @@ class DashboardApplicationListView(LoginRequiredMixin, View):
         """Create APP"""
         name = request.POST.get('app_name')
     
-=======
-        name = request.POST.get('appname')
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         packageid = request.POST.get('packageid')
           
-        description = request.POST.get('description')
+        description = request.POST.get('project_description')
         if not all([name, packageid]):
-            return JsonResponse({'code': 201, 'message': 'Incomplete data'})
+            return {'code': 201, 'message': 'Incomplete data'}
 
-        apps = ApplicationsModel.objects.filter(packageid=packageid)
+        apps = ApplicationsModelV2.objects.filter(Q(packageid=packageid)|Q(name=name))
         if len(apps) > 0:
-            return JsonResponse({'code': 201, 'message': 'The Package Name was used'})
+            return {'code': 201, 'message': 'The Package Name was used'}
 
-<<<<<<< HEAD
         # Use Packageid to generate a Token for the application for verification
         serializer = Serializer(settings.SECRET_KEY, 8640000000)
         token = {'packageid': packageid,'user_uid':request.user.user_uid}
         token = serializer.dumps(token)  
         token = token.decode('utf8')
-=======
-        # Use Packageid to generate Token for the application for verification
-        serializer = Serializer(settings.SECRET_KEY, 8640000000)
-        token = {'packageid': packageid,'user_uid':request.user.user_uid}
-        token = serializer.dumps(token)
-        token = token.decode('utf8') 
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         
         from utils.generate_random_pid import generate_unique_id
-        app_uid = generate_unique_id(packageid)
-        ApplicationsModel.objects.create(app_uid=app_uid,
+        app_uid = str(generate_unique_id(packageid))
+        
+        app_icon_image = request.FILES.get('app_icon_image')
+        if app_icon_image is not None:
+            assets_save_folder = os.path.join(
+                str(self.request.user.user_uid), app_uid, 'Showcases', name)
+            assets_save_folder = assets_save_folder.replace('\\', '/')
+            oss_path = "%s/%s" % (assets_save_folder, f"{create_md5(app_icon_image.name).replace('.jpg', '')}.jpg")
+            from utils.aliyun_utility import AliyunObjectStorage
+            aliyunStorage = AliyunObjectStorage()
+            aliyunStorage._save(name=oss_path, content=app_icon_image.read(), progress_callback=None)
+            app_icon_image_url = aliyunStorage.url(oss_path)
+        else:
+            app_icon_image_url = "%s%s"%(settings.BASE_WEBSITE_URL,default_image_url)
+        ApplicationsModelV2.objects.create(app_uid=app_uid,
                                          name=name,
+                                         app_icon_image=app_icon_image_url,
                                          packageid=packageid,
                                          user_uid=request.user.user_uid,
                                          token=token,
                                          description=description)        
         cache.delete(f"{request.user.user_uid}_get_applist")
-        return JsonResponse({'code': 200, 'message': 'success'})
-
-
+        return {'code': 200, 'message': 'success'}
+   
 class DashboardApplicationDeleteView(LoginRequiredMixin, View):
     def post(self, request):
         """Delete Application"""
         app_uid = request.POST.get('app_uid')
-        apps = ApplicationsModel.objects.filter(app_uid=app_uid)
+        apps = ApplicationsModelV2.objects.filter(app_uid=app_uid)
         if len(apps) == 0:
             return JsonResponse({'code': 201, 'message': 'Incorrect package name'})
         for app in apps:
@@ -96,7 +106,6 @@ class DashboardApplicationDeleteView(LoginRequiredMixin, View):
 class DashboardApplicationProjectListView(LoginRequiredMixin, View):
     def get(self, request, app_uid):
         """AR experience project list"""        
-<<<<<<< HEAD
         arexperience_project = cache.get(f"{request.user.user_uid}_{app_uid}_get_arexperienceList")
         if arexperience_project is None:
             arexperience_project = ARExperienceModelV2.objects.filter(app_uid=app_uid).order_by('-create_time')
@@ -124,54 +133,74 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
         
     def create_project(self,request):
         """Create proejct"""
-=======
-        arshowcase_list = cache.get(f"{request.user.user_uid}_{app_uid}_get_arexperienceList")
-        if arshowcase_list is None:
-            arshowcase_list = ARExperienceModel.objects.filter(app_uid=app_uid).order_by('create_time')
-            cache.set(f"{request.user.user_uid}_get_projectList",arshowcase_list,settings.API_CACHE_EXPIRED)
-        paginator = Paginator(arshowcase_list, 10)
-        page = int(request.GET.get("page", 1))
-        arshowcase_pages = paginator.get_page(page)
-        appinfo = ApplicationsModel.objects.get(app_uid=app_uid)
-        return render(request, 'dashboard/arexperience_list.html', {'arshowcase_list': arshowcase_pages, 'appinfo': appinfo})
-
-    def post(self, request, app_uid):
-        """Create new AR experience project"""
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         try:
             app_uid = request.POST.get('app_uid')
-            projectname = request.POST.get('projectname')
-            description = request.POST.get('projectdescription',"")
+            project_name = request.POST.get('project_name')
+            project_description = request.POST.get('project_description',"")
+            
+            if not all([app_uid,project_name]):
+                return {'code': 201, 'message': 'Incomplete data'}
 
-            if not all([app_uid,projectname]):
-                return JsonResponse({'code': 201, 'message': 'Incomplete data'})
-
-            projects = ARExperienceModel.objects.filter(name=projectname, app_uid=app_uid)
+            projects = ARExperienceModelV2.objects.filter(project_name=project_name, app_uid=app_uid)
             if len(projects) > 0:
-                return JsonResponse({'code': 201, 'message': 'The Package Name was used'})
+                return {'code': 201, 'message': 'The Package Name was used'}
 
             from utils.generate_random_pid import generate_unique_id
-            arexperience = ARExperienceModel.objects.create(arexperience_uid=generate_unique_id(projectname),
-                                                            name=projectname,
+            arexperience = ARExperienceModelV2.objects.create(project_id=generate_unique_id(project_name),
+                                                            project_name=project_name,
                                                             app_uid=app_uid,
-                                                            description=description)
+                                                            user_uid=self.request.user.user_uid,
+                                                            project_description=project_description,
+                                                            project_header ="%s%s"%(settings.BASE_WEBSITE_URL,default_image_url),
+                                                            project_icon="%s%s"%(settings.BASE_WEBSITE_URL,default_image_url))
             arexperience.save()
 
-            arexperienceAsset = ARExperienceAsset.objects.create(
-                arexperience_uid=arexperience.arexperience_uid)
-            arexperienceAsset.save()
+            arexperienceAsset_iOS = ARExperienceResourceV2.objects.create(project_id=arexperience.project_id,
+                                                                        platform_type="iOS")
+            arexperienceAsset_iOS.save()
 
-            app = ApplicationsModel.objects.get(app_uid=app_uid)
+            arexperienceAsset_Android = ARExperienceResourceV2.objects.create(project_id=arexperience.project_id,
+                                                                        platform_type="Android")
+            arexperienceAsset_Android.save()
+            
+            arexperienceAsset_WSA = ARExperienceResourceV2.objects.create(project_id=arexperience.project_id,
+                                                                        platform_type="WSA")
+            arexperienceAsset_WSA.save()
+
+            app = ApplicationsModelV2.objects.get(app_uid=app_uid)
             app.child_project = app.child_project + 1
             app.save()
 
             cache.delete(f"{request.user.user_uid}_{app_uid}_get_arexperienceList")
-            return JsonResponse({'code': 200, 'message': 'success'})
+
+            public_project_list_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_arexperiencepubliclist"
+            cache.delete(public_project_list_cache_key)
+            
+            return {'code': 200, 'message': 'success'}
         except Exception as e:
-            return JsonResponse({'code': 201, 'message': 'Unknow Error'})
+            print(repr(e))
+            return {'code': 201, 'message': repr(e)}
 
+    def update_app(self,request):
+        app_uid = request.POST.get('app_uid')
+        app_icon_image = request.FILES.get('app_icon_image')
+        if app_icon_image is not None:
+            assets_save_folder = os.path.join(str(self.request.user.user_uid), app_uid)
+            assets_save_folder = assets_save_folder.replace('\\', '/')
+            oss_path = "%s/%s" % (assets_save_folder, f"{create_md5(app_icon_image.name).replace('.jpg', '')}.jpg")
+            from utils.aliyun_utility import AliyunObjectStorage
+            aliyunStorage = AliyunObjectStorage()
+            aliyunStorage._save(name=oss_path, content=app_icon_image.read(), progress_callback=None)
+            app_icon_image_url = aliyunStorage.url(oss_path)
+        else:
+            app_icon_image_url = "%s%s"%(settings.BASE_WEBSITE_URL,default_image_url)
+        app = ApplicationsModelV2.objects.get(app_uid=app_uid)
+        app.app_icon_image = app_icon_image_url
+        app.save()
+        
+        cache.delete(f"{request.user.user_uid}_get_applist")
+        return {'code': 200, 'message': 'success'}
 
-<<<<<<< HEAD
     def delete_app(self,request):
         """Del App"""
         app_uid = request.POST.get('app_uid')
@@ -188,54 +217,57 @@ class DashboardApplicationProjectListView(LoginRequiredMixin, View):
     def delete_project(self,request):
         """Del project"""
         project_id = request.POST.get('project_id')
-=======
-class DashboardApplicationProjectDeleteView(LoginRequiredMixin, View):
-
-    def post(self, request):
-        """Delete the AR experience"""
-        arexperience_uid = request.POST.get('arexperience_uid')
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         app_uid = request.POST.get('app_uid')
-        project = ARExperienceModel.objects.get(app_uid=app_uid, arexperience_uid=arexperience_uid)
-        asset = ARExperienceAsset.objects.get(arexperience_uid=arexperience_uid)
+        project = ARExperienceModelV2.objects.get(app_uid=app_uid, project_id=project_id)
+        assets = ARExperienceResourceV2.objects.filter(project_id=project_id)
         if project is None:
-            return JsonResponse({'code': 201, 'message': 'Incorrect projecet id'})
+            return {'code': 201, 'message': 'Incorrect projecet id'}
 
-<<<<<<< HEAD
         # 1. Del assets
-=======
-        # 1.Delete resources
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         from utils.aliyun_utility import AliyunObjectStorage
 
         aliyun_oss = AliyunObjectStorage()
+        sub_url_start_index = len(settings.OSS_BASE_URL+"/")
+        for asset in assets:
+            if asset.json_url != '' and aliyun_oss.exists(asset.json_url[sub_url_start_index:]):
+                aliyun_oss.batch_delete_objects([asset.json_url[sub_url_start_index:], asset.bundle_url[sub_url_start_index:]])
+            asset.delete()
 
-        sub_url_start_index = len(settings.OSS_BASE_URL)
-        if asset.android_json is not '':
-            if aliyun_oss.exists(asset.android_json[len(settings.OSS_BASE_URL):]):
-                aliyun_oss.batch_delete_objects(
-                    [asset.android_json[sub_url_start_index:], asset.android_bundle[sub_url_start_index:]])
+        if project.project_preview != "":
+            for preview in json.loads(project.project_preview):
+                if aliyun_oss.exists(preview[sub_url_start_index:]):
+                    aliyun_oss.delete(preview[sub_url_start_index:])
 
-        if asset.ios_json is not '':             
-            if aliyun_oss.exists(asset.ios_json[len(settings.OSS_BASE_URL):]):
-                print(type([asset.android_json[sub_url_start_index:],asset.android_bundle[sub_url_start_index:]]))
-                aliyun_oss.batch_delete_objects(
-                    [asset.ios_json[sub_url_start_index:], asset.ios_bundle[sub_url_start_index:]])
+        if "https" in project.project_icon:
+            if aliyun_oss.exists(project.project_icon[sub_url_start_index:]):
+                aliyun_oss.delete(project.project_icon[sub_url_start_index:])
 
-<<<<<<< HEAD
         if "https" in project.project_header:
             if aliyun_oss.exists(project.project_header[sub_url_start_index:]):
                 aliyun_oss.delete(project.project_header[sub_url_start_index:])
         
         # 2.Del project
-=======
-        # 2.Delete AR experience project
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         project.delete()
-        asset.delete()
 
-        child_projecet_count = ApplicationsModel.objects.get(
-            app_uid=app_uid).child_project - 1
-        ApplicationsModel.objects.update(child_project=child_projecet_count)
+        app = ApplicationsModelV2.objects.get(user_uid=request.user.user_uid,app_uid=app_uid)
+        app.child_project = app.child_project - 1
+        app.save()
+        
         cache.delete(f"{request.user.user_uid}_{app_uid}_get_arexperienceList")
-        return JsonResponse({'code': 200, 'message': 'Success'})
+
+        query_by_app_uid_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_arexperiencebytagslist"
+        cache.delete(query_by_app_uid_cache_key)
+
+        query_project_recommend_key = f"api_{request.user.user_uid}_{app_uid}_get_recommendList"
+        cache.delete(query_project_recommend_key)
+
+        page_cache_key = f"api_{request.user.user_uid}_get_arexperience_page"
+        cache.delete(page_cache_key)
+
+        detail_cache_key = f"api_{project_id}_get_arexperience_detail"
+        cache.delete(detail_cache_key)
+
+        public_project_list_cache_key = f"api_{request.user.user_uid}_{app_uid}_get_arexperiencepubliclist"
+        cache.delete(public_project_list_cache_key)
+
+        return {'code': 200, 'message': 'Success'}

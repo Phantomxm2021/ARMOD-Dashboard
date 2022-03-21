@@ -1,0 +1,280 @@
+{% extends "dashboardbase.html" %}
+{% load static %}
+{% block title %}
+Applications
+{% endblock %}
+
+{% block body %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Applications</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="{% url 'applications:apps' %}">Development</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Applications</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+          <button class="btn btn-sm btn-neutral" data-target="#create-new-modal-App" data-toggle="modal">Create New
+            App</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div>
+    <div class="card">
+      <!-- Card header -->
+      <div class="card-header border-0">
+        <h3 class="mb-0">Application List</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col" class="sort" data-sort="name">PID</th>
+              <th scope="col" class="sort" data-sort="budget">Name</th>
+              <th scope="col" class="sort" data-sort="status">Package Name</th>
+              <th scope="col" class="sort" data-sort="status">Create Time</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody class="list">
+            {% for app in applist %}
+            <tr>
+              <th scope="row">
+                <span class="name mb-0 text-sm">{{app.app_uid}}</span>
+              </th>
+              <td>
+                <span class="text">{{app.name}}</span>
+              </td>
+              <td>
+                <span class="text">{{app.}}</span>
+              </td>
+              <td>
+                <span class="text">{{app.create_time}}</span>
+              </td>
+              <td class="table-actions text-right">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item"
+                      href="{% url 'arshowcasescenter:arshowcasescenter' app.app_uid %}">Showcases Center</a>
+                    <a class="dropdown-item" href="{% url 'applications:appdetails' app.app_uid %}">Develop Center</a>
+                  </div>
+                </div>
+                <a type="button" class="btn btn-icon-only btn-sm text-light" data-toggle="modal"
+                  onclick="pre_delete({{app.app_uid}});" data-target="#modal-notification">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Card footer -->
+      <div class="card-footer py-4">
+        {% if applist.has_other_pages %}
+        <nav aria-label="...">
+          <ul class="pagination justify-content-end mb-0">
+            {% if applist.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ applist.previous_page_number }}" tabindex="-1">
+                <i class="fas fa-angle-left"></i>
+                <span class="sr-only">Previous</span>
+              </a>
+            </li>
+            {% endif %}
+            {% for page_num in applist.paginator.page_range %}
+            {% if page_num == applist.number %}
+            <li class="page-item active">
+              {% else %}
+            <li class="page-item">
+              {% endif %}
+              <a class="page-link" href="?page={{page_num}}">{{page_num}}</a>
+            </li>
+            {% endfor %}
+            {% if applist.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ applist.next_page_number }}">
+                <i class="fas fa-angle-right"></i>
+                <span class="sr-only">Next</span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="create-new-modal-App" tabindex="-1" role="dialog"
+  aria-labelledby="create-new-modal-App-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="AppModalLabel">New Application</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id='createapp_form' role="form" action="{% url 'applications:apps' %}" method='post'
+          class="needs-validation" novalidate onsubmit="return sub_createapp();">
+          {% csrf_token %}
+          <div class="form-group  needs-validation" novalidate>
+            <label for="App-text-input" class="form-control-label">Application Name</label>
+            <input id='appname' class="form-control" type="text" placeholder="ARMOD Example" name='appname'>
+          </div>
+          <div class="form-group">
+            <label for="package-text-input" class="form-control-label">Package Name</label>
+            <input id='' class="form-control" type="text" placeholder="com.phantoms.armod" name=''
+              required>
+            <div id='Tips' class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="descript-text-input" class="form-control-label">Description</label>
+            <textarea id='description' class="form-control" type="text" placeholder="Describe your application" rows="3"
+              name='description'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id='createapp' type="button" class="btn btn-primary" onclick="sub_createapp()">Create App</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="col-md-4">
+  <div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="modal-notification"
+    aria-hidden="true">
+    <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+      <div class="modal-content bg-gradient-danger">
+
+        <div class="modal-header">
+          <h6 class="modal-title" id="modal-title-notification">Delete Application</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="py-3 text-center">
+            <i class="ni ni-bell-55 ni-3x"></i>
+            <h4 class="heading mt-4">You are about to delete the Application!</h4>
+            <p>After the application is deleted, the file cannot be restored. Please confirm the deletion by pressing
+              the OK button！</p>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-white btn-block" onclick="deleteapp()">Continue To Delete!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+
+<script src="{% static 'js/customnotify.js' %}"></script>
+<script>
+  var app_uid = -1;
+  var Patten = pattern = /^(com)(.\w+){2,}/;
+
+  $("#").change(function (event) {
+    if (!Patten.test(event.target.value)) {
+      if (!event.target.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      $("#").addClass('is-invalid')
+      $("#").addClass('has-danger')
+      $("#Tips").text(event.target.validationMessage)
+    }
+    else {
+      $("#").removeClass('is-invalid')
+      $("#").removeClass('has-danger')
+      $("#").addClass('is-valid')
+    }
+  })
+
+  function sub_createapp() {
+    $("#").change()
+    $("#appname").change()
+    $("#description").change()
+
+    appname = $("#appname").val()
+     = $("#").val()
+    description = $("#description").val()
+
+    if (!Patten.test()
+      || appname == '') return;
+
+    $("#createapp_form").ajaxSubmit(function (message) {
+      tips = message.message
+      switch (message.code) {
+        case 201:
+          new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', tips)
+          break;
+        case 200:
+          window.location.reload();
+          break;
+      }
+    });
+
+    return false;
+  }
+
+  function pre_delete(id) {
+    app_uid = id;
+  }
+
+  function deleteapp() {
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    data = { 'app_uid': app_uid };
+    $.ajax({
+      
+      type: 'POST',
+      data: data,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      success: function (result) {
+        switch (result.code) {
+          case 200:
+            window.location.reload()
+            break;
+          case 201:
+            new Notify('top', 'right', 'ni ni-bell-55', 'danger', 'ERROR!!!', result.message)
+            break;
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

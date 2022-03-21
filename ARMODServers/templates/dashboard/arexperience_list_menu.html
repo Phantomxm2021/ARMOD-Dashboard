@@ -1,15 +1,24 @@
-<div class="col-lg-6 col-5 text-right">
-    <div class="dropdown  w-100">
-        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Menu
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <button  class="dropdown-item" data-target="#create-new-project-modal" data-toggle="modal">
-                New ARExperience</button>
-            <button  class="dropdown-item" data-toggle="modal" data-target="#modal-app-info">
-                Application Information</button>
-        </div>
+<div class="dropdown  w-100">
+    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="ni ni-bullet-list-67"></i>
+    </button>
+
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <button class="dropdown-item lang" key="text_project_new" data-target="#create-new-project-modal"
+            data-toggle="modal">
+            New Project</button>
+
+        <button class="dropdown-item lang" key="text_project_tag_manager" onclick="display_tag_manager()">
+            Tag Manager</button>
+
+        <button class="dropdown-item lang" key="text_project_app_detail" data-toggle="modal"
+            data-target="#modal-app-info">
+            App Detail</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item lang" key="text_project_app_delete" data-toggle="modal"
+            data-target="#delete-modal-app">
+            Delete App</button>
     </div>
 </div>
-

@@ -8,37 +8,208 @@
     <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
     <meta name="author" content="Creative Tim">
 
-    <title>ARMOD - {% block title %}{% endblock %}|Platform as a service AR solution.</title>
+    <title>XRMOD - {% block title %}{% endblock %}|助您构建属于私人的XR平台</title>
 
     <link rel="icon" href="{% static 'img/brand/favicon.png' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'css/googleapis.css' %}?family=Open+Sans:300,400,600,700" type="text/css">
     <link rel="stylesheet" href="{% static 'vendor/nucleo/css/nucleo.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'vendor/@fortawesome/fontawesome-free/css/all.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'vendor/animate.css/animate.min.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css' %}"> 
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/select2/dist/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/argon.min.css' %}?v=1.1.0" type="text/css">
-    
 
-    
+
+
     <style>
         ::-webkit-scrollbar {
             width: 8px;
             height: 10px;
         }
-    
+
         ::-webkit-scrollbar-thumb {
             background-color: rgba(0, 0, 0, .2);
             border-radius: 6px;
             cursor: pointer;
         }
-    
+
         ::-webkit-scrollbar-track {
             background-color: #ddd;
             border-radius: 6px;
         }
+
+        .avatar-custom {
+            width: 100px !important;
+            height: 100px !important;
+            background-size: cover;
+            object-fit: cover;
+        }
+
+        #side-drawer {
+            height: 100vh;
+            width: 500px;
+            /* Reference: https://forums.envato.com/t/standard-sidebar-width/75633 */
+            z-index: 1032;
+            /* z-index of standard bootstrap navbar is 1030 + 1 offset due to side-drawer-void */
+            top: 0;
+            right: -500px;
+            transition: right 0.25s ease;
+        }
+
+
+        #side-drawer-full{
+            height: 100vh;
+            width: 800px;
+            z-index: 1032;
+            top: 0;
+            right:  -800px;
+            transition: right 0.25s ease;
+        }
+
+        #side-drawer-full-void{
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1031;
+            /* z-index of standard bootstrap navbar is 1030 */
+            background: rgba(0, 0, 0, .6);
+        }
+
+        #side-drawer-void {
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1031;
+            /* z-index of standard bootstrap navbar is 1030 */
+            background: rgba(0, 0, 0, .6);
+        }
+
+        .scroller-container {
+            background-color: #fafafa;
+            overflow-x: auto;
+            white-space: nowrap;
+            height: 256px;
+            width: 100%;
+            display: flex;
+            margin-top: 2px;
+            padding-left: 8px;
+        }
+
+
+        .scroller-image_wrap {
+            position: relative;
+        }
+
+        .scroller-image_wrap:hover {
+            z-index: 2;
+        }
+
+        .scroller-image_wrap:hover .delete-button {
+            display: block;
+        }
+
+        .scroller-item {
+            position: relative;
+            float: left;
+            margin-right: 10px;
+            border-radius: 15px;
+            width: 120px;
+            height: 213px;
+            vertical-align: bottom;
+            background-position: top left;
+            background-repeat: no-repeat;
+            background-size: cover;
+            object-fit: cover;
+        }
+
+
+        .tb-tooltip-thin {
+            background-color: #f3f3f3;
+            clip-path: circle(30% at 50% 50%);
+            display: inline-flex;
+            font-size: 9px;
+            box-sizing: border-box;
+            padding: 0.75em;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAABECAYAAADk6ueFAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2VpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0idXVpZDo1MDg1RkUxQzVDRjFEQzExODQ5OTlCMkQ0NzNCNDBDNSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowNjI5RUVBQ0E5NEQxMUUzOTU0Nzk1OTA5MUE5M0QzNiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowNjI5RUVBQkE5NEQxMUUzOTU0Nzk1OTA5MUE5M0QzNiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKE1hY2ludG9zaCkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5NzJkNTUwZC00NWE0LTQxMDktODAzZC1mNjMyYTgwODc5YjIiIHN0UmVmOmRvY3VtZW50SUQ9InV1aWQ6NTA4NUZFMUM1Q0YxREMxMTg0OTk5QjJENDczQjQwQzUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4cUxgnAAACUUlEQVR42uxYTS8DURSdjkZsykJiY+Fj0wQLHzs0tUT9AfwBG1bShQhBbLq16g/QX0BZasVSbEh0UR8LwdLHQkTVuXJHnqjOm3amb+g7yUmbvDf3nnkz8+67J1Ac7jccoA2cBKNgH9gJNvPYI3gFnoIZcB+8kw0ckBQSAePgOBiUjF0A98AEeGg32bQZ7wZ3wCw45UAEoYGvyXKM7kqFTIMnYMyoHjGONeNUyAqYEp6/G6BY2xxbSsgSuGZ4B4q9bCeEHsem4T02OFdJIV1g0qgdkpzzh5AtMFRDISHO+U3IqEtfRyVfU0QUEjfUYdESQtv2hEIhVDLaTP4TVCiEck+aXMBUY8zkKqoavSaXctXoCtruHUcn7qQaGSi7p9CKBHywIp9v7BPYWuGduIUnWpFLHyzIFQk584GQUxJy4AMhGZMPuG8KRVDuNAm556O/KlDue6v6JhQKSYjHAOo7dhWISFs9j3hCW+A9pVagXPOljooX4FwNhcxxzpKn+NRvfYfLWOVcZfuaDZ7opYh12U6PJs6Czy4KeOaY6057X1q6fpe+pjTHSlXqBuS5o49yR19wkPydr4ly25B3wx8RjZqYYNR0gC089gBes1GT5dJx6+Q8Io3cyyv9FAUawq84RqtRDDc1SscOnA/2yMzzzDEKH59JvSPaMbKgHSPxcWjHyEJ9O0a5oV5/OUa0s1L9uFFo1lA70a4dI+0YVe0YWWW6WuAz/SeOkc2daMdIO0b15Rhhi9CO0VdPjNXQjpF2jLRj9LcdI9lDc5bpmWP0IcAAmqu0aLKaMu4AAAAASUVORK5CYII=) 0 0 no-repeat;
+            background-position: 0 0;
+            background-size: 17px;
+            cursor: pointer;
+            display: none;
+            height: 17px;
+            left: -5px;
+            top: -5px;
+            width: 17px;
+            z-index: 3;
+        }
+
+        .avatar-custom-lx {
+            width: 74px;
+            height: 74px;
+            object-fit: cover;
+        }
+
+        .avatar-150 {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .avatar-150 {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .avatar-155 {
+            width: 155px;
+            height: 155px;
+            object-fit: cover;
+        }
+
+        .card-img-top-custom {
+            width: 210;
+            height: 140px;
+            border-top-left-radius: calc(0.375rem - 1px);
+            border-top-right-radius: calc(0.375rem - 1px);
+            object-fit: cover;
+        }
+
+        .form-control-custom {
+            outline: none; 
+            color: #8898aa;
+            border: none;
+            border-bottom: 1px solid #dee2e6;
+            background-clip: padding-box;
+            height: calc(1.5em+1.25rem+5px);
+            font-size: 0.875rem;
+            transition: all 0.15s ease-in-out;
+            font-weight: 400;
+            display: block;
+            width: 100%;
+        }
+
+        .form-control-custom:focus {
+            border-bottom: 1px solid #5e72e4;
+        }
+        .align-center{
+            display: flex;
+        }
+        .header-img{
+            width: 420px;
+            height: 280px;
+            border-radius: calc(0.375rem - 1px);
+            
+            object-fit: cover;
+        }
     </style>
-   
+    <link rel="stylesheet" href="{% static '/css/cover.css' %}">
+
     <link rel="stylesheet" href="{% static 'css/spinner.css' %}" type="text/css">
     {% block head%}
     {% endblock %}
@@ -46,7 +217,7 @@
 </head>
 
 <body>
-    <nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-xs navbar-light bg-white" id="sidenav-main">
+    <nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-sm navbar-light bg-white" id="sidenav-main">
         <div class="scrollbar-inner">
             <!-- Brand -->
             <div class="sidenav-header d-flex align-items-center">
@@ -74,13 +245,17 @@
                             <a class="nav-link active" href="#navbar-dashboards" data-toggle="collapse" role="button"
                                 aria-expanded="true" aria-controls="navbar-dashboards">
                                 <i class="ni ni-shop text-primary"></i>
-                                <span class="nav-link-text">Development</span>
+                                <span class="nav-link-text lang" key="nav_link_development">Development</span>
                             </a>
                             <div class="collapse show" id="navbar-dashboards">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="{% url 'applications:apps' %}" class="nav-link">AR Applications</a>                                     
+                                        <a href="{% url 'applications:apps' %}" class="nav-link lang" key="nav_link_arapp">AR Applications</a>
                                     </li>
+
+                                  {% block  nav_item %}
+                                  {% endblock %}
+
                                 </ul>
                             </div>
                         </li>
@@ -93,14 +268,15 @@
 
     <div class="main-content" id="panel">
         <!-- Topnav -->
-        <nav class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom">
+        <!-- <nav class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom"> -->
+        <nav class="navbar navbar-top navbar-expand navbar-light border-bottom">
             <div class="container-fluid">
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Navbar links -->
                     <ul class="navbar-nav align-items-center ml-md-auto">
                         <li class="nav-item d-xl-none">
                             <!-- Sidenav toggler -->
-                            <div class="pr-3 sidenav-toggler sidenav-toggler-dark" data-action="sidenav-pin"
+                            <div class="pr-3 sidenav-toggler sidenav-toggler-light" data-action="sidenav-pin"
                                 data-target="#sidenav-main">
                                 <div class="sidenav-toggler-inner">
                                     <i class="sidenav-toggler-line"></i>
@@ -116,7 +292,7 @@
                                 aria-expanded="false">
                                 <div class="media align-items-center">
                                     <span class="avatar avatar-sm rounded-circle">
-                                        <img alt="Image placeholder" src="{% static 'img/theme/logo.jpg' %}">    
+                                        <img alt="Image placeholder" src="{% static 'img/theme/logo.jpg' %}">
                                     </span>
                                     <div class="media-body ml-2 d-none d-lg-block">
                                         <span class="mb-0 text-sm  font-weight-bold">{{user.username}}</span>
@@ -125,7 +301,7 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <div class="dropdown-header noti-title">
-                                    <h6 class="text-overflow m-0">Welcome!</h6>
+                                    <h6 class="text-overflow m-0 lang" key="text_user_hello">Welcome!</h6>
                                 </div>
                                 <!-- <a href="#!" class="dropdown-item">
                                     <i class="ni ni-single-02"></i>
@@ -135,7 +311,7 @@
                                 <div class="dropdown-divider"></div>
                                 <a href="{% url 'auth:logout' %}" class="dropdown-item">
                                     <i class="ni ni-user-run"></i>
-                                    <span>Logout</span>
+                                    <span class="lang" key="text_user_logout">Logout</span>
                                 </a>
                             </div>
                         </li>
@@ -148,30 +324,31 @@
         {% block body%}
         {% endblock %}
     </div>
-    <footer class="py-5" id="footer-main">
+    <footer class="py-2" id="footer-main">
         <div class="container">
             <div class="row align-items-center justify-content-xl-center">
                 {% block footer %}
                 {% endblock %}
                 <div class="copyright text-center text-muted">
-                    &copy; 2021 <a href="" class="font-weight-bold ml-1" target="_blank">ARMOD </a>Copyright
+                    &copy; <script>document.write(new Date().getFullYear());</script> <a href="" class="font-weight-bold ml-1" target="_blank">ARMOD </a>Copyright
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Core -->
-    <!-- <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script> -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
+    <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery.form.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'vendor/js-cookie/js.cookie.js' %}"></script>
     <script src="{% static 'vendor/jquery.scrollbar/jquery.scrollbar.min.js' %}"></script>
     <script src="{% static 'vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js' %}"></script>
-    
+    <script src="{% static 'js/language.js' %}"></script>
+    <script src="{% static 'js/localization.js' %}"></script>
+
     <!-- Optional JS -->
     <script src="{% static  'vendor/select2/dist/js/select2.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap-notify/bootstrap-notify.min.js' %}"></script>    
+    <script src="{% static 'vendor/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js' %}"></script>
     <script src="{% static 'vendor/clipboard/dist/clipboard.min.js' %}"></script>
     <script src="{% static 'js/argon.js' %}?v=1.1.0"></script>

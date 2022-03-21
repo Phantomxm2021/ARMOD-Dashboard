@@ -21,7 +21,6 @@ urlpatterns = [
     path('auth/', include('Apps.Users.urls', namespace='auth')),
     path('dashboard/', include('Apps.Applications.urls', namespace='applications')),
     path('dashboard/', include('Apps.ARExperiences.urls', namespace='arexperiences')),
-<<<<<<< HEAD
     path('dashboard/', include('Apps.TagManager.urls', namespace='tagmanager')),  
 
     path('api/v1/',include('Apps.Api.urls', namespace='api')),
@@ -30,8 +29,4 @@ urlpatterns = [
     #last 
     path('',include('Apps.Index.urls', namespace='index')),
 
-=======
-    path('dashboard/', include('Apps.ARShowcasesCenter.urls', namespace='arshowcasescenter')),       
-    path('api/v1/',include('Apps.Api.urls', namespace='api')),
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
     ]

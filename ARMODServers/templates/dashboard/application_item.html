@@ -1,0 +1,11 @@
+<a href="{% url 'applications:appdetails' app.app_uid %}" class="text-primary icon-move-right">
+    <div class="card card-lift--hover shadow border-0">
+        <img class="card-img-top-custom"
+            src="{{app.app_icon_image}}">
+        <div class="card-footer">
+            <h4 class="text-center">
+                {{app.name}}
+            </h4>
+        </div>
+    </div>
+</a>

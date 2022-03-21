@@ -17,7 +17,6 @@ class ApplicationsModel(BaseModel):
         verbose_name = 'Applications'
         verbose_name_plural = verbose_name
 
-<<<<<<< HEAD
 class ApplicationsModelV2(BaseModel):
     """应用信息"""
     app_uid =  models.BigIntegerField(default = -1,unique=True,db_index=True,verbose_name='App Id')
@@ -32,5 +31,3 @@ class ApplicationsModelV2(BaseModel):
         db_table = 'armod_applications_v2'
         verbose_name = 'Applications_V2'
         verbose_name_plural = verbose_name
-=======
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)

@@ -46,8 +46,11 @@ INSTALLED_APPS = [
     'Apps.Users',
     'Apps.Applications',
     'Apps.ARExperiences',
+    'Apps.TagManager',
     'Apps.ARShowcasesCenter',
     'Apps.Api',
+    'Apps.Apiv2',
+    'Apps.Index',
 ]
 
 MIDDLEWARE = [
@@ -97,7 +100,9 @@ REST_FRAMEWORK = {
         'anon': '10000/day',
         'user': '10000/day',
         'api': '10000/day'
-    }
+    },
+    'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10 
 }
 
 
@@ -107,18 +112,10 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-<<<<<<< HEAD
         'NAME': 'DB_NAME',
         'USER': 'USER_NAME',
         'PASSWORD': 'PASSWORD',
         'HOST': 'YOUR_HOST', 
-=======
-        'NAME': 'armod_db',
-        'USER': 'armod_admin',
-        'PASSWORD': 'Admin@ARMOD',
-        'HOST': 'rm-uf632120sr3gy67kl.mysql.rds.aliyuncs.com',  # Product
-        # 'HOST':'rm-uf632120sr3gy67kl4o.mysql.rds.aliyuncs.com', # Test
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
         'PORT': '3306',
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -193,11 +190,7 @@ OSS_ENDPOINT="YOUR_OSS_END_POINT"
 OSS_BUCKET_NAME = "YOUR_BUCKET_NAME"
 ALIYUN_OSS_ACCESS_URL = 'YOUR_ALIYUN_OSS_ACCESS_URL'
 OSS_BASE_URL = 'YOUR_OSS_BASE_URL'
-<<<<<<< HEAD
 BASE_WEBSITE_URL= 'YOUR_DOMAIN_URL'
-=======
-
->>>>>>> parent of 7df37a3 (upgrade to 1.0-alpha.2)
 
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
